@@ -9,9 +9,10 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: backend_db
       MYSQL_USER: backend_user
-      MYSQL_PASSWORD: quess
-
+      MYSQL_PASSWORD: backend_password
       
+      
+
     ports:
       - "3306:3306"
     volumes:
