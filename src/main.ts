@@ -8,7 +8,7 @@
   //  await app.listen(5000);
   app.enableCors({
       origin:[
-        'http://localhost:3000',
+        // 'http://localhost:3000',
       ],
         // frontend domain
       methods:['GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'],
@@ -23,7 +23,7 @@
 
     app.use(bodyParser.json({ limit: '50mb' }));
     app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-  await app.listen(5000, '0.0.0.0');
+  await app.listen(6000, '0.0.0.0');
   
   }
 
