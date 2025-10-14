@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: backend_mysql_quess
+    container_name: backend_mysql_aayurcare_quess
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -18,11 +18,11 @@ services:
       - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
-      - backend_quess_network
+      - backend_mysql_aayurcare_quess
 
   app:
     build: .
-    container_name: backend_mysql_quess
+    container_name: backend_mysql_aayurcare_quess
     
     ports:
       - "6000:6000"
@@ -34,12 +34,12 @@ services:
     depends_on:
       - mysql
     networks: 
-      - backend_quess_network
+      - backend_mysql_aayurcare_quess
 
 volumes:
   mysql_data:
     driver: local
 
 networks:
-  backend_quess_network:
+  backend_mysql_aayurcare_quess:
     driver: bridge
