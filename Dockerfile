@@ -1,25 +1,3 @@
-# # Stage 1: Build
-# FROM node:18 AS builder
-# WORKDIR /app
-
-# COPY package*.json ./
-# RUN npm install
-# COPY . .
-# RUN npm run build   # generates /app/dist
-
-# # Stage 2: Run
-# FROM node:18 AS runner
-# WORKDIR /app
-
-# COPY package*.json ./
-# RUN npm install --only=production
-
-# COPY --from=builder /app/dist ./dist
-
-# EXPOSE 5000
-# CMD ["npm", "run", "start:prod"]
-
-
 # ===========================
 # Stage 1: Build (with dev dependencies)
 # ===========================
@@ -53,8 +31,8 @@ RUN npm ci --only=production
 # Copy compiled dist folder from builder stage
 COPY --from=builder /build/dist ./dist
 
-# Copy .env if you have one
-COPY --from=builder /build/.env ./
+# ✅ Remove this line (causing error)
+# COPY --from=builder /build/.env ./
 
 # Expose port (change if needed)
 EXPOSE 6000
