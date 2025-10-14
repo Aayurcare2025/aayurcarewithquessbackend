@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: backend_mysql
+    container_name: backend_mysql_quess
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -23,6 +23,7 @@ services:
   app:
     build: .
     container_name: backend_app
+    
     ports:
       - "6000:6000"
     restart: always
