@@ -57,7 +57,7 @@ COPY --from=builder /build/dist ./dist
 COPY --from=builder /build/.env ./
 
 # Expose port (change if needed)
-EXPOSE 5000
+EXPOSE 6000
 
 # Start the app
 CMD ["node", "dist/main.js"]
