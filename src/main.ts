@@ -9,6 +9,7 @@
   app.enableCors({
       origin:[
         // 'http://localhost:3000',
+        'https://partner-quess.aayurcare.com'
       ],
         // frontend domain
       methods:['GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'],
