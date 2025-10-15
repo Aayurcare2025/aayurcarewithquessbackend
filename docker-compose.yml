@@ -1,14 +1,17 @@
+
 version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: backend_mysql_aayurcare_quess_db
+    container_name: backend_mysql_aayurcare_quess
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: backend_db
       MYSQL_USER: backend_user
       MYSQL_PASSWORD: quess
+
+      
     ports:
       - "3307:3306"
     volumes:
@@ -19,7 +22,8 @@ services:
 
   app:
     build: .
-    container_name: backend_app_aayurcare_quess
+    container_name: backend_mysql_aayurcare_quess
+    
     ports:
       - "6000:6000"
     restart: always
