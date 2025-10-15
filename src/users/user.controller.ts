@@ -30,6 +30,7 @@ export class UserController {
     try {
       return await this.userService.userregister(userRegister);
     } catch (error) {
+      console.log("error",error);
       throw new BadRequestException(error.message || 'Registration failed');
     }
   }

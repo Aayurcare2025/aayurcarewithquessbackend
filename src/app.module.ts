@@ -137,6 +137,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { User } from './users/user.entity';
 import { UsersModule } from './users/user.module';
+import { ClaimsModule } from './claims/claim.module';
 
 @Module({
   imports: [
@@ -145,6 +146,7 @@ import { UsersModule } from './users/user.module';
     }),
     AuthModule, 
     UsersModule,
+    ClaimsModule,
 
     // ✅ Use ConfigService for DB settings
     TypeOrmModule.forRootAsync({
