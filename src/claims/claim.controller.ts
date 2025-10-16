@@ -41,6 +41,7 @@ export class ClaimsController {
 
     if (file) {
     //   const fileName = `${Date.now()}-${file.originalname}`;
+    console.log("file",file);
       const fileName = file.originalname;
       const bucketName = process.env.AWS_BUCKET_NAME;
       const region = process.env.AWS_REGION;
@@ -62,8 +63,9 @@ export class ClaimsController {
 
     return this.claimsService.createData({
       ...body,
-      formData: parsedFormData,
-      filePath: s3FileUrl, // S3 URL
+      // formData: parsedFormData,
+      // filePath: s3FileUrl, // S3 URL
+       file_upload: s3FileUrl,
     });
   }
 }

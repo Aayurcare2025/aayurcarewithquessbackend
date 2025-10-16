@@ -32,7 +32,7 @@ import { Claims } from './claim.entity';
         reEnterAccountNumber: payload.reEnterAccountNumber,
         IFSCCode: payload.IFSCCode,
         BankName: payload.BankName,
-        BankBranchName: payload.branch
+        BankBranchName: payload.BankBranchName
       });
 
 
