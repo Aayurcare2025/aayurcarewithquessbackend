@@ -71,7 +71,44 @@ export class ClaimsController {
 
 
 
-  @Post("apply")
+//   @Post("apply")
+// @UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
+// async applyClaims(
+//   @UploadedFile() file: Express.Multer.File,
+//   @Body() body: any
+// ): Promise<Claims> {
+//   console.log("Received body:", body);
+//   console.log("Received file:", file?.originalname);
+
+//   let s3FileUrl: string | null = null;
+
+//   if (file) {
+//     const fileName = file.originalname;
+//     const bucketName = process.env.AWS_BUCKET_NAME;
+//     const region = process.env.AWS_REGION;
+
+//     await s3.send(
+//       new PutObjectCommand({
+//         Bucket: bucketName,
+//         Key: fileName,
+//         Body: file.buffer,
+//         ContentType: file.mimetype,
+//         ServerSideEncryption: "AES256",
+//       })
+//     );
+
+//     s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+//   }
+
+//   return this.claimsService.createData({
+//     ...body,
+//     file_upload: s3FileUrl,
+//   });
+// }
+
+// }
+
+@Post("apply")
 @UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
 async applyClaims(
   @UploadedFile() file: Express.Multer.File,
@@ -80,12 +117,12 @@ async applyClaims(
   console.log("Received body:", body);
   console.log("Received file:", file?.originalname);
 
+  // Upload to S3 if file exists
   let s3FileUrl: string | null = null;
-
   if (file) {
-    const fileName = file.originalname;
-    const bucketName = process.env.AWS_BUCKET_NAME;
-    const region = process.env.AWS_REGION;
+    const fileName = `${Date.now()}-${file.originalname}`;
+    const bucketName = process.env.AWS_BUCKET_NAME!;
+    const region = process.env.AWS_REGION!;
 
     await s3.send(
       new PutObjectCommand({
@@ -100,10 +137,25 @@ async applyClaims(
     s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
   }
 
-  return this.claimsService.createData({
-    ...body,
+  // Ensure you provide all required fields
+  const payload = {
+    name: body.name || "",
+    phonenumber: body.phonenumber || "",
+    emailid: body.emailid || null,
+    kycdocument: body.kycdocument || null,
+    consultationtype: body.consultationtype || null,
+    accountHolderName: body.accountHolderName || "",
+    bankAccountNumber: body.bankAccountNumber || "",
+    reEnterAccountNumber: body.reEnterAccountNumber || "",
+    IFSCCode: body.IFSCCode || "",
+    BankName: body.BankName || "",
+    BankBranchName: body.BankBranchName || "",
     file_upload: s3FileUrl,
-  });
+  };
+
+  return this.claimsService.createData(payload);
 }
+
+
 
 }
