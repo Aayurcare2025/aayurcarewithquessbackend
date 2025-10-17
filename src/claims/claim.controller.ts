@@ -118,24 +118,28 @@ async applyClaims(
   console.log("Received file:", file?.originalname);
 
   // Upload to S3 if file exists
-  let s3FileUrl: string | null = null;
-  if (file) {
-    const fileName = `${Date.now()}-${file.originalname}`;
-    const bucketName = process.env.AWS_BUCKET_NAME!;
-    const region = process.env.AWS_REGION!;
+let s3FileUrl: string | null = null;
 
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: bucketName,
-        Key: fileName,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-        ServerSideEncryption: "AES256",
-      })
-    );
+if (file) {
+  const fileName = `${Date.now()}-${file.originalname}`;
+  const bucketName = process.env.AWS_BUCKET_NAME!;
+  const region = process.env.AWS_REGION!;
 
-    s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
-  }
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ServerSideEncryption: "AES256",
+    })
+  );
+
+  s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+} else {
+  console.log("No file uploaded."); // <-- prevents undefined errors
+}
+
 
   // Ensure you provide all required fields
   const payload = {
