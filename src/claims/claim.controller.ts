@@ -22,50 +22,88 @@ const s3 = new S3Client({
 export class ClaimsController {
   constructor(private readonly claimsService:ClaimsService) {}
 
+  // @Post("apply")
+  // @UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
+  // async applyClaims(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Body() body: any
+  // ): Promise<Claims> {
+  //   let parsedFormData = {};
+  //   try {
+  //     parsedFormData = JSON.parse(body.formData);
+  //   } catch (e) {
+  //       console.log("error",e);
+        
+  //     // ignore parse error
+  //   }
+
+  //   let s3FileUrl: string | null = null;
+
+  //   if (file) {
+  //   //   const fileName = `${Date.now()}-${file.originalname}`;
+  //   console.log("file",file);
+  //     const fileName = file.originalname;
+  //     const bucketName = process.env.AWS_BUCKET_NAME;
+  //     const region = process.env.AWS_REGION;
+
+  //     await s3.send(
+  //       new PutObjectCommand({
+  //         Bucket: bucketName,
+  //         Key: fileName,
+  //         Body: file.buffer,
+  //         ContentType: file.mimetype,
+  //         ServerSideEncryption: "AES256",
+        
+  //       //   SSEKMSKeyId: process.env.AWS_KMS_KEY_ID,
+  //       })
+  //     );
+
+  //     s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+  //   }
+
+  //   return this.claimsService.createData({
+  //     ...body,
+  //     // formData: parsedFormData,
+  //     // filePath: s3FileUrl, // S3 URL
+  //      file_upload: s3FileUrl,
+  //   });
+  // }
+
+
+
   @Post("apply")
-  @UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
-  async applyClaims(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: any
-  ): Promise<Claims> {
-    let parsedFormData = {};
-    try {
-      parsedFormData = JSON.parse(body.formData);
-    } catch (e) {
-        console.log("error",e);
-        
-      // ignore parse error
-    }
+@UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
+async applyClaims(
+  @UploadedFile() file: Express.Multer.File,
+  @Body() body: any
+): Promise<Claims> {
+  console.log("Received body:", body);
+  console.log("Received file:", file?.originalname);
 
-    let s3FileUrl: string | null = null;
+  let s3FileUrl: string | null = null;
 
-    if (file) {
-    //   const fileName = `${Date.now()}-${file.originalname}`;
-    console.log("file",file);
-      const fileName = file.originalname;
-      const bucketName = process.env.AWS_BUCKET_NAME;
-      const region = process.env.AWS_REGION;
+  if (file) {
+    const fileName = file.originalname;
+    const bucketName = process.env.AWS_BUCKET_NAME;
+    const region = process.env.AWS_REGION;
 
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: bucketName,
-          Key: fileName,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-          ServerSideEncryption: "AES256",
-        
-        //   SSEKMSKeyId: process.env.AWS_KMS_KEY_ID,
-        })
-      );
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: fileName,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ServerSideEncryption: "AES256",
+      })
+    );
 
-      s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
-    }
-
-    return this.claimsService.createData({
-      ...body,
-      // formData: parsedFormData,
-      // filePath: s3FileUrl, // S3 URL
-       file_upload: s3FileUrl,
-    });
+    s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
   }
+
+  return this.claimsService.createData({
+    ...body,
+    file_upload: s3FileUrl,
+  });
+}
+
 }
