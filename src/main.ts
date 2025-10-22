@@ -26,7 +26,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   app.enableCors({
-    origin: ['https://partner-quess.aayurcare.com'], // frontend URL
+    origin: ['https://partner-quess.aayurcare.com','http://localhost:3000'], // frontend URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
