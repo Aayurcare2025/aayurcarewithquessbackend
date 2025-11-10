@@ -35,9 +35,9 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   // await app.listen(6000, '0.0.0.0');
-    const port = 6000;
+    const port =7000;
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
+  console.log(`Application is running on: http://localhost:${port}`);
 }
 
 

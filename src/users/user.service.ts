@@ -288,8 +288,14 @@ export class UsersService {
   ) {}
 
   async sendLoginOtp(email: string) {
-    const user = await this.userRepo.findOne({ where: { email } });
-    if (!user) throw new BadRequestException('Email not found');
+    let user = await this.userRepo.findOne({ where: { email } });
+    // if (!user) throw new BadRequestException('Email not found');
+  if (!user) {
+    user = this.userRepo.create({ email });
+    await this.userRepo.save(user);
+    
+    console.log("New user created:", user);
+  }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
     const expires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes validity
@@ -320,8 +326,12 @@ export class UsersService {
   }
 
   async verifyOtpAndLogin(email: string, otp: string) {
-    const user = await this.userRepo.findOne({ where: { email } });
-    if (!user) throw new UnauthorizedException('Invalid email or OTP');
+    let user = await this.userRepo.findOne({ where: { email } });
+    // if (!user) throw new UnauthorizedException('Invalid email or OTP');
+ if (!user) {
+    user = this.userRepo.create({ email });
+    await this.userRepo.save(user);
+  }
 
     if (user.otpCode !== otp || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
       throw new UnauthorizedException('Invalid or expired OTP');

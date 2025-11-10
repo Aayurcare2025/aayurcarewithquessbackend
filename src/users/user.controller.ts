@@ -124,6 +124,7 @@ export class UserController {
     return this.userService.sendLoginOtp(body.email);
   }
 
+
   @Post('verify-otp')
   async verifyOtp(@Body() body: { email: string; otp: string }) {
     return this.userService.verifyOtpAndLogin(body.email, body.otp);

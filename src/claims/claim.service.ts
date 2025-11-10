@@ -16,10 +16,8 @@ import { Claims } from './claim.entity';
 
 
   async createData(payload: any): Promise<Claims> {
-
-
-
       const claim = this.ClaimsRepository.create({
+        
         // id: payload.id,
         name: payload.name,
         phonenumber: payload.phonenumber,
