@@ -17,7 +17,7 @@ export class PayuController {
       productinfo: body.productinfo,
       firstname: body.firstname,
       email: body.email,
-        phone: body.phone || '9999999999', // add default test phone
+       phone: body.phone || '9999999999', // add default test phone
       surl: 'http://localhost:7000/payment/success',
       furl: 'http://localhost:7000/payment/failure',
     };
