@@ -18,8 +18,8 @@ export class PayuController {
       firstname: body.firstname,
       email: body.email,
        phone: body.phone || '9999999999', // add default test phone
-      surl: 'http://localhost:7000/payment/success',
-      furl: 'http://localhost:7000/payment/failure',
+      surl: 'https://api.partner-quess.aayurcare.com/payment/success',
+      furl: 'https://api.partner-quess.aayurcare.com/payment/failure',
     };
 
     const payuData = await this.payuService.initiatePayment(paymentData);
@@ -45,14 +45,14 @@ export class PayuController {
 handleSuccess(@Body() body, @Res() res: Response) {
   console.log('✅ Payment success:', body);
   // Redirect to your frontend's thank-you page
-(res as any).redirect('http://localhost:3000/payment-success');
+(res as any).redirect('https://partner-quess.aayurcare.com/payment-success');
 }
 
 @Post('/failure')
 handleFailure(@Body() body, @Res() res: Response) {
   console.log('❌ Payment failure:', body);
   // Redirect to your frontend's failure page
-  (res as any).redirect('http://localhost:3000/payment-failure');
+  (res as any).redirect('https://partner-quess.aayurcare.com/payment-failure');
 
 
 
