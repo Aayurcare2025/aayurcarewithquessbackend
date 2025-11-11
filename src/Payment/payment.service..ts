@@ -7,6 +7,17 @@ export class PayuService {
   private salt = process.env.PAYU_SALT;
   private payuUrl = process.env.PAYU_BASE_URL || 'https://secure.payu.in';
 
+
+
+
+  
+  constructor() {
+    console.log('🔍 PAYU ENV CHECK:', {
+      PAYU_KEY: this.key,
+      PAYU_SALT: this.salt,
+      PAYU_BASE_URL: this.payuUrl,
+    });
+  }
   // Step 1: Generate hash for transaction
   // generateHash(data: any): string {
   //   const hashString = `${this.key}|${data.txnid}|${data.amount}|${data.productinfo}|${data.firstname}|${data.email}|||||||||||${this.salt}`;
@@ -33,14 +44,18 @@ generateHash(data: any): string {
 
   // Step 2: Prepare payment initiation data
   async initiatePayment(paymentData: any) {
-    const hash = this.generateHash(paymentData);
+    let hash = this.generateHash(paymentData);
     return {
       ...paymentData,
       key: this.key,
       hash,
       payuUrl: this.payuUrl + '/_payment',
     };
+    
+    
+    
   }
+
 
   // Step 3: Verify PayU callback hash
   verifyHash(response: any): boolean {
