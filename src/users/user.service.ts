@@ -270,96 +270,150 @@
 // }
 
 
-
-
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, Logger, BadRequestException, HttpException } from '@nestjs/common';
+import axios from 'axios';
 import * as nodemailer from 'nodemailer';
-import { User } from './user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
-    private readonly jwtService: JwtService,
-  ) {}
+export class  UserService {
+  private readonly logger = new Logger(UserService.name);
 
-  async sendLoginOtp(email: string) {
-    let user = await this.userRepo.findOne({ where: { email } });
-    // if (!user) throw new BadRequestException('Email not found');
-  if (!user) {
-    user = this.userRepo.create({ email });
-    await this.userRepo.save(user);
-    
-    console.log("New user created:", user);
+  // TEMP STORE (RAM)
+  private otpStore = new Map<string, string>();
+
+  constructor(private readonly configService: ConfigService) {}
+
+  // ---------------- ENV VARIABLES ----------------
+  private BSNL_TOKEN = process.env.BSNL_TOKEN;
+  private URL = process.env.BSNL_URL;
+  private HEADER = process.env.BSNL_HEADER;
+  private ENTITY_ID = process.env.BSNL_ENTITY_ID;
+  private TEMPLATE_ID = process.env.TEMPLATE_ID;
+  private VARIABLE_KEY = process.env.VARIABLE_KEY;
+
+  // Generate OTP
+  private generateOtp() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-    const expires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes validity
+  // -------------------------------------------------------
+  // SEND OTP
+  // -------------------------------------------------------
+  async sendOtp(phone: string) {
+    if (!phone) throw new BadRequestException('Phone number required');
 
-    user.otpCode = otp;
-    user.otpExpiresAt = expires;
-    await this.userRepo.save(user);
+    phone = phone.trim();
+    const otp = this.generateOtp();
 
-    // Send OTP email
-    const transporter = nodemailer.createTransport({
-      host: process.env.GODADDY_EMAIL_HOST,
-      port: Number(process.env.GODADDY_EMAIL_PORT),
-      secure: true,
-      auth: {
-        user: process.env.GODADDY_EMAIL_USER,
-        pass: process.env.GODADDY_EMAIL_PASS,
-      },
-    });
+    // Store OTP
+    this.otpStore.set(phone, otp);
 
-    await transporter.sendMail({
-      from: process.env.GODADDY_EMAIL_USER,
-      to: user.email,
-      subject: 'Your OTP for Aayurcare Login',
-      html: `<p>Your login OTP is <b>${otp}</b>. It is valid for 5 minutes.</p>`,
-    });
+    const cleanPhone = phone.replace('+91', '').trim();
 
-    return { message: 'OTP sent successfully to your email.' };
-  }
+    const payload = {
+      Header: this.HEADER,
+      Target: cleanPhone,
+      Is_Unicode: '0',
+      Is_Flash: '0',
+      Message_Type: 'SI',
+      Entity_Id: this.ENTITY_ID,
+      Content_Template_Id: this.TEMPLATE_ID,
+      Template_Keys_and_Values: [
+        {
+          Key: this.VARIABLE_KEY,
+          Value: otp,
+        },
+      ],
+    };
 
-  async verifyOtpAndLogin(email: string, otp: string) {
-    let user = await this.userRepo.findOne({ where: { email } });
-    // if (!user) throw new UnauthorizedException('Invalid email or OTP');
- if (!user) {
-    user = this.userRepo.create({ email });
-    await this.userRepo.save(user);
-  }
+    try {
+      const response = await axios.post(this.URL!, payload, {
+        headers: {
+          Authorization: this.BSNL_TOKEN,
+          'Content-Type': 'application/json',
+        },
+        timeout: 15000,
+      });
 
-    if (user.otpCode !== otp || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
-      throw new UnauthorizedException('Invalid or expired OTP');
+      this.logger.log('BSNL Response: ' + JSON.stringify(response.data));
+
+      return {
+        success: true,
+        phone,
+        otp, // REMOVE IN PRODUCTION
+        response: response.data,
+      };
+    } catch (err: any) {
+      throw new HttpException(
+        err.response?.data || 'Failed to send OTP',
+        err.response?.status || 500,
+      );
     }
+  }
 
-    // Clear OTP after successful login
-    user.otpCode = null;
-    user.otpExpiresAt = null;
-    await this.userRepo.save(user);
+  // -------------------------------------------------------
+  // VERIFY OTP
+  // -------------------------------------------------------
+  async verifyOtp(phone: string, otp: string) {
+    phone = phone.trim();
+    otp = otp.trim();
 
-    // Generate JWT
-    const payload = { email: user.email, id: user.id };
-    const token = this.jwtService.sign(payload);
+    const storedOtp = this.otpStore.get(phone);
+    if (!storedOtp) throw new BadRequestException('OTP expired or not found');
+
+    if (storedOtp !== otp)
+      throw new BadRequestException('Invalid OTP');
+
+    this.otpStore.delete(phone);
 
     return {
-      message: 'Login successful',
-      access_token: token,
-      user: { id: user.id, email: user.email },
+      success: true,
+      message: 'OTP verified successfully',
     };
   }
+
+  // -------------------------------------------------------
+  // SEND CALLBACK EMAIL
+  // -------------------------------------------------------
+  async sendCallbackEmail(formData: {
+    name: string;
+    email: string;
+    phone: string;
+    problemdescription: string;
+  }) {
+    const { name, email, phone, problemdescription } = formData;
+
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.GODADDY_EMAIL_HOST,
+        port: Number(process.env.GODADDY_EMAIL_PORT),
+        secure: true,
+        auth: {
+          user: process.env.GODADDY_EMAIL_USER,
+          pass: process.env.GODADDY_EMAIL_PASS,
+        },
+      });
+
+      await transporter.sendMail({
+        from: this.configService.get('GODADDY_EMAIL_USER'),
+        to: this.configService.get('GODADDY_EMAIL_TO'),
+        subject: `📞 Callback Request from ${name}`,
+        html: `
+          <h3>New Callback Request</h3>
+          <p><b>Name:</b> ${name}</p>
+          <p><b>Email:</b> ${email}</p>
+          <p><b>Phone:</b> ${phone}</p>
+          <p><b>Problem:</b> ${problemdescription}</p>
+        `,
+      });
+
+      await transporter.verify();
+      console.log('SMTP server ready to take messages');
+
+    } catch (err) {
+      console.error('Error sending callback email:', err);
+      throw new BadRequestException('Failed to send callback request email.');
+    }
+  }
 }
-
-
-
-
-
-
-
-
-
-
