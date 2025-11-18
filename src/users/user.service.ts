@@ -376,44 +376,89 @@ export class  UserService {
   // -------------------------------------------------------
   // SEND CALLBACK EMAIL
   // -------------------------------------------------------
-  async sendCallbackEmail(formData: {
-    name: string;
-    email: string;
-    phone: string;
-    problemdescription: string;
-  }) {
-    const { name, email, phone, problemdescription } = formData;
+  // async sendCallbackEmail(formData: {
+  //   name: string;
+  //   email: string;
+  //   phone: string;
+  //   problemdescription: string;
+  // }) {
+  //   const { name, email, phone, problemdescription } = formData;
 
-    try {
-      const transporter = nodemailer.createTransport({
-        host: process.env.GODADDY_EMAIL_HOST,
-        port: Number(process.env.GODADDY_EMAIL_PORT),
-        secure: true,
-        auth: {
-          user: process.env.GODADDY_EMAIL_USER,
-          pass: process.env.GODADDY_EMAIL_PASS,
-        },
-      });
+  //   try {
+  //     const transporter = nodemailer.createTransport({
+  //       host: process.env.GODADDY_EMAIL_HOST,
+  //       port: Number(process.env.GODADDY_EMAIL_PORT),
+  //       secure: true,
+  //       auth: {
+  //         user: process.env.GODADDY_EMAIL_USER,
+  //         pass: process.env.GODADDY_EMAIL_PASS,
+  //       },
+  //     });
 
-      await transporter.sendMail({
-        from: this.configService.get('GODADDY_EMAIL_USER'),
-        to: this.configService.get('GODADDY_EMAIL_TO'),
-        subject: `📞 Callback Request from ${name}`,
-        html: `
-          <h3>New Callback Request</h3>
-          <p><b>Name:</b> ${name}</p>
-          <p><b>Email:</b> ${email}</p>
-          <p><b>Phone:</b> ${phone}</p>
-          <p><b>Problem:</b> ${problemdescription}</p>
-        `,
-      });
+  //     await transporter.sendMail({
+  //       from: this.configService.get('GODADDY_EMAIL_USER'),
+  //       to: this.configService.get('GODADDY_EMAIL_TO'),
+  //       subject: `📞 Callback Request from ${name}`,
+  //       html: `
+  //         <h3>New Callback Request</h3>
+  //         <p><b>Name:</b> ${name}</p>
+  //         <p><b>Email:</b> ${email}</p>
+  //         <p><b>Phone:</b> ${phone}</p>
+  //         <p><b>Problem:</b> ${problemdescription}</p>
+  //       `,
+  //     });
 
-      await transporter.verify();
-      console.log('SMTP server ready to take messages');
+  //     await transporter.verify();
+  //     console.log('SMTP server ready to take messages');
 
-    } catch (err) {
-      console.error('Error sending callback email:', err);
-      throw new BadRequestException('Failed to send callback request email.');
-    }
+  //   } catch (err) {
+  //     console.error('Error sending callback email:', err);
+  //     throw new BadRequestException('Failed to send callback request email.');
+  //   }
+  // }
+
+
+async sendCallbackEmail(formData: {
+  name: string;
+  email: string;
+  phone: string;
+  problemdescription: string;
+}) {
+  const { name, email, phone, problemdescription } = formData;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.GODADDY_EMAIL_HOST,
+      port: Number(process.env.GODADDY_EMAIL_PORT),
+      secure: true,
+      auth: {
+        user: process.env.GODADDY_EMAIL_USER,
+        pass: process.env.GODADDY_EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: this.configService.get('GODADDY_EMAIL_USER'),
+      to: this.configService.get('GODADDY_EMAIL_TO'),
+      subject: `📞 Callback Request from ${name}`,
+      html: `
+        <h3>New Callback Request</h3>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Phone:</b> ${phone}</p>
+        <p><b>Problem:</b> ${problemdescription}</p>
+      `,
+    });
+
+    await transporter.verify();
+
+    return { message: "Callback request email sent successfully" };  // FIX
+  } catch (err) {
+    console.error('Error sending callback email:', err);
+    throw new BadRequestException('Failed to send callback request email.');
   }
+}
+
+
+  
 }
