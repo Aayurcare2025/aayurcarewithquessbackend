@@ -15,9 +15,9 @@ export class PayuController {
       txnid,
       amount: body.amount,
       productinfo: body.productinfo,
-      firstname: body.firstname,
-      email: body.email,
-       phone: body.phone || '9999999999', // add default test phone
+      // firstname: body.firstname,
+      // email: body.email,
+      //  phone: body.phone || '9999999999', // add default test phone
       surl: 'https://api.partner-quess.aayurcare.com/payment/success',
       furl: 'https://api.partner-quess.aayurcare.com/payment/failure',
     };
@@ -60,3 +60,4 @@ handleFailure(@Body() body, @Res() res: Response) {
  
 }
 }
+
