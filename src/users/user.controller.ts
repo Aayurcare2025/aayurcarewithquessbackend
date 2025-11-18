@@ -11,6 +11,7 @@ export class UsersController {
   // -------------------------------------------------------
   @Post('send')
   async sendOtp(@Body('phone') phone: string) {
+    console.log("phone" , phone); 
     return await this.otpService.sendOtp(phone);
   }
 
