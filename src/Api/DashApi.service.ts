@@ -73,7 +73,7 @@ export class DashService {
    */
 
   //error handling if entering employee details is wrong:
-  async getApplicantDataAndSave(applicant_id: string, contact_no: string, first_name: string) {
+  async getApplicantDataAndSave(applicant_id: string, contact_no: string) {
     try {
 
       //  Step 1: Prepare API body:--
@@ -107,7 +107,6 @@ export class DashService {
 
       const applicant = {
         applicant_id: res.applicant_id,
-        first_name: res.first_name || first_name,
         last_name: res.last_name,
         contact_no: res.contact_no || contact_no,
         email_id: res.email_id,
