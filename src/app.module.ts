@@ -135,22 +135,22 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { User } from './users/user.entity';
-import { UsersModule } from './users/user.module';
-import { ClaimsModule } from './claims/claim.module';
-import { DashModule } from './Api/Dash.module';
-import { PaymentModule } from './Payment/payment.module';
+// import { User } from './users/user.entity';
+// import { UsersModule } from './users/user.module';
+// import { ClaimsModule } from './claims/claim.module';
+// import { DashModule } from './Api/Dash.module';
+// import { PaymentModule } from './Payment/payment.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,  // makes env vars available everywhere
     }),
-    AuthModule, 
-    UsersModule,
-    ClaimsModule,
-    DashModule,
-    PaymentModule,
+    // AuthModule, 
+    // UsersModule,
+    // ClaimsModule,
+    // DashModule,
+    // PaymentModule,
     
 
     // ✅ Use ConfigService for DB settings
@@ -164,7 +164,7 @@ import { PaymentModule } from './Payment/payment.module';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        entities: [User],
+        entities: [],
         autoLoadEntities: true,
         synchronize: true,
       }),

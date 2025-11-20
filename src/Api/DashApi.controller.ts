@@ -39,6 +39,11 @@ export class DashController {
       return { error: 'applicant_id, contact_no, and first_name are required' };
     }
 
+
+    
+    //process not set in env:
+
+    
     const data = await this.dashService.getApplicantDataAndSave(applicant_id, contact_no);
 
     return {
