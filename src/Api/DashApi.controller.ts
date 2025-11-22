@@ -29,14 +29,15 @@ export class DashController {
   //
   //  Main API - GET /dash/applicant
   // Example: /dash/applicant?applicant_id=2003126588&contact_no=8628908673
+  
   @Get('applicant')
   async getApplicant(
     @Query('applicant_id') applicant_id: string,
-    @Query('contact_no') contact_no: string,
+    // @Query('contact_no') contact_no: string,
    
   ) {
-    if (!applicant_id || !contact_no) {
-      return { error: 'applicant_id, contact_no, and first_name are required' };
+    if (!applicant_id ) {
+      return { error: 'applicant_id is not required' };
     }
 
 
@@ -44,12 +45,11 @@ export class DashController {
     //process not set in env:
 
     
-    const data = await this.dashService.getApplicantDataAndSave(applicant_id, contact_no);
+    const data = await this.dashService.getApplicantDataAndSave(applicant_id);
 
     return {
       message: ' Data fetched and saved successfully',
       applicant_id,
-      contact_no,
       data,
     };
   }

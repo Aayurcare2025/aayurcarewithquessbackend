@@ -282,7 +282,9 @@ export class  UserService {
   // TEMP STORE (RAM)
   private otpStore = new Map<string, string>();
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {
+    console.log("Loaded BSNL token:", process.env.BSNL_TOKEN);
+  }
 
   // ---------------- ENV VARIABLES ----------------
   private BSNL_TOKEN = process.env.BSNL_TOKEN;
@@ -297,9 +299,70 @@ export class  UserService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
+
+
+  
   // -------------------------------------------------------
   // SEND OTP
   // -------------------------------------------------------
+  // async sendOtp(phone: string) {
+
+  //     // this.logger.log("🔐 BSNL_TOKEN: " + this.BSNL_TOKEN);
+  //   if (!phone) throw new BadRequestException('Phone number required');
+
+  //   phone = phone.trim();
+  //   const otp = this.generateOtp();
+
+  //   // Store OTP
+  //   this.otpStore.set(phone, otp);
+
+  //   const cleanPhone = phone.replace('+91', '').trim();
+
+  //   const payload = {
+  //     Header: this.HEADER,
+  //     Target: cleanPhone,
+  //     Is_Unicode: '0',
+  //     Is_Flash: '0',
+  //     Message_Type: 'SI',
+  //     Entity_Id: this.ENTITY_ID,
+  //     Content_Template_Id: this.TEMPLATE_ID,
+  //     Template_Keys_and_Values: [
+  //       {
+  //         Key: this.VARIABLE_KEY,
+  //         Value: otp,
+  //       },
+  //     ],
+  //   };
+
+  //   try {
+  //     const response = await axios.post(this.URL!, payload, {
+  //       headers: {
+  //         Authorization: this.BSNL_TOKEN,
+  //         'Content-Type': 'application/json',
+  //       },
+  //       timeout: 15000,
+  //     });
+
+  //     this.logger.log('BSNL Response: ' + JSON.stringify(response.data));
+
+  //     return {
+  //       success: true,
+  //       phone,
+  //       otp, // REMOVE IN PRODUCTION
+  //       response: response.data,
+  //     };
+  //   } catch (err: any) {
+
+  //     this.logger.error('Error sending OTP: ' + (err.response?.data || err.message));
+  //     throw new HttpException(
+  //       err.response?.data || 'Failed to send OTP',
+  //       err.response?.status || 500,
+  //     );
+  //   }
+  // }
+
+
+
   async sendOtp(phone: string) {
     if (!phone) throw new BadRequestException('Phone number required');
 
@@ -345,6 +408,8 @@ export class  UserService {
         response: response.data,
       };
     } catch (err: any) {
+      console.log("err", err);  
+      this.logger.error('Error sending OTP: ' + (err.response?.data || err.message));
       throw new HttpException(
         err.response?.data || 'Failed to send OTP',
         err.response?.status || 500,
