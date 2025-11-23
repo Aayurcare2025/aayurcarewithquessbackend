@@ -45,6 +45,54 @@
 #     driver: bridge
 
 
+# version: '3.8'
+
+# services:
+#   mysql:
+#     image: mysql:8.0
+#     container_name: backend_mysql_kirthana
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: rootpassword
+#       MYSQL_DATABASE: backend_db
+#       MYSQL_USER: backend_user
+#       MYSQL_PASSWORD: backend_password
+#     ports:
+#       - "3307:3306"  # Expose MySQL to host
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#       - ./mysql-init:/docker-entrypoint-initdb.d
+#     networks:
+#       - backend_network
+
+#   app:
+#     build: .
+#     container_name: aayurcare-quess
+#     restart: always
+#     environment:
+#       NODE_ENV: production
+#       DB_HOST: mysql              # 👈 Use service name, not localhost
+#       DB_PORT: 3306
+#       DB_USER: backend_user
+#       DB_PASSWORD: backend_password
+#       DB_NAME: backend_db
+#       PORT: 6000
+#     ports:
+#       - "6000:6000"
+#     env_file:
+#       - .env
+#     depends_on:
+#       - mysql
+#     networks:
+#       - backend_network
+
+# volumes:
+#   mysql_data:
+#     driver: local
+
+# networks:
+#   backend_network:
+#     driver: bridge
 version: '3.8'
 
 services:
@@ -58,7 +106,7 @@ services:
       MYSQL_USER: backend_user
       MYSQL_PASSWORD: backend_password
     ports:
-      - "3307:3306"  # Expose MySQL to host
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
@@ -69,20 +117,12 @@ services:
     build: .
     container_name: aayurcare-quess
     restart: always
-    environment:
-      NODE_ENV: production
-      DB_HOST: mysql              # 👈 Use service name, not localhost
-      DB_PORT: 3306
-      DB_USER: backend_user
-      DB_PASSWORD: backend_password
-      DB_NAME: backend_db
-      PORT: 6000
-    ports:
-      - "6000:6000"
     env_file:
-      - .env
+      - .env         # ✔ load all DB variables from .env
     depends_on:
       - mysql
+    ports:
+      - "6000:6000"
     networks:
       - backend_network
 
