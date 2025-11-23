@@ -108,24 +108,28 @@ export class DashService {
 
       
 
+
+      
       //  Step 4: Create/Update data object:
 
+
+      //data
       const applicant = {
         applicant_id: res.applicant_id,
+        first_name: res.first_name, 
         last_name: res.last_name,
+        contact_no: res.contact_no,
         // contact_no: res.contact_no || contact_no,
-        email_id: res.email_id,
-        dob: res.DOB,
+        email_id: res.email_id || '',
+        DOB: res.DOB,
         gender: res.gender,
-        pincode: res.Pincode,
+        Pincode: res.Pincode,
         city: res.City,
-        state: res.State,
+        State: res.State,
         customer_name: res.customer_name,
-        doj: res.DOJ,
+        DOJ: res.DOJ,
         employee_status: res.employee_status,
         designation: res.designation,
-        salary: res.salary,
-        gross: res.gross,
         work_location: res.work_location,
         company_name: res.employee_loan_status?.CompanyName,
       };

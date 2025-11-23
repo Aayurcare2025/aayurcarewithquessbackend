@@ -21,37 +21,31 @@ export class Applicant {
   email_id: string;
 
   @Column({ nullable: true })
-  dob: string;
+  DOB: string;
 
   @Column({ nullable: true })
   gender: string;
 
   @Column({ nullable: true })
-  pincode: string;
+  Pincode: string;
 
   @Column({ nullable: true })
-  city: string;
+  City: string;
 
   @Column({ nullable: true })
-  state: string;
+  State: string;
 
   @Column({ nullable: true })
   customer_name: string;
 
   @Column({ nullable: true })
-  doj: string;
+  DOJ: string;
 
   @Column({ nullable: true })
   employee_status: string;
 
   @Column({ nullable: true })
   designation: string;
-
-  @Column({ nullable: true })
-  salary: number;
-
-  @Column({ nullable: true })
-  gross: number;
 
   @Column({ nullable: true })
   work_location: string;
