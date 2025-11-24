@@ -124,7 +124,7 @@ export class DashService {
         DOB: res.DOB,
         gender: res.gender,
         Pincode: res.Pincode,
-        city: res.City,
+        City: res.City,
         State: res.State,
         customer_name: res.customer_name,
         DOJ: res.DOJ,
