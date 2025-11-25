@@ -9,11 +9,20 @@ export class UsersController {
   // -------------------------------------------------------
   // SEND OTP
   // -------------------------------------------------------
+
+
+
   @Post('send')
   async sendOtp(@Body('phone') phone: string) {
-    console.log("phone" , phone); 
+    console.log("phone" , phone);
     return await this.otpService.sendOtp(phone);
+
+
+
   }
+
+
+
 
   // -------------------------------------------------------
   // VERIFY OTP
@@ -25,6 +34,9 @@ export class UsersController {
   ) {
     return await this.otpService.verifyOtp(phone, otp);
   }
+
+
+  
 
 
   
