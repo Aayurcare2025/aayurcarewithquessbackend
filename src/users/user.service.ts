@@ -274,6 +274,9 @@ import { Injectable, Logger, BadRequestException, HttpException } from '@nestjs/
 import axios from 'axios';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { Repository } from 'typeorm';
+import { Login } from './login.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class  UserService {
@@ -282,7 +285,10 @@ export class  UserService {
   // TEMP STORE (RAM)
   private otpStore = new Map<string, string>();
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly configService: ConfigService,
+    @InjectRepository(Login)
+    private readonly loginRepo: Repository<Login>,
+  ) {
     console.log("Loaded BSNL token:", process.env.BSNL_TOKEN);
   }
 
@@ -431,12 +437,29 @@ export class  UserService {
       throw new BadRequestException('Invalid OTP');
 
     this.otpStore.delete(phone);
+    await this.saveLogin(phone);
 
     return {
       success: true,
       message: 'OTP verified successfully',
     };
   }
+
+async saveLogin(phone: string) {
+  const existing = await this.loginRepo.findOne({
+    where: { phonenumber: phone }
+  });
+
+  // ❌ Already exists → don't save again
+  if (existing) return existing;
+
+  // ✅ Save new login
+  const newUser = this.loginRepo.create({ phonenumber: phone });
+  return await this.loginRepo.save(newUser);
+}
+
+
+
 
   // -------------------------------------------------------
   // SEND CALLBACK EMAIL
