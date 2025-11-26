@@ -1,91 +1,56 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+// import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 
-import { FileInterceptor } from "@nestjs/platform-express";
-import { memoryStorage } from "multer";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { Claims } from "./claim.entity";
-import { ClaimsService } from "./claim.service";
+// import { AnyFilesInterceptor } from "@nestjs/platform-express";
+// import { memoryStorage } from "multer";
+// import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+// import { Claims } from "./claim.entity";
+// import { ClaimsService } from "./claim.service";
+// import { MailService } from "./Mail.service";
 
-if (!process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-  throw new Error("AWS credentials or region not set in environment variables");
-}
+// if (!process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+//   throw new Error("AWS credentials or region not set in environment variables");
+// }
 
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+// const s3 = new S3Client({
+//   region: process.env.AWS_REGION,
+//   credentials: {
+//     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   },
+// });
 
-@Controller("claims")
-export class ClaimsController {
-  constructor(private readonly claimsService:ClaimsService) {}
-
-  // @Post("apply")
-  // @UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
-  // async applyClaims(
-  //   @UploadedFile() file: Express.Multer.File,
-  //   @Body() body: any
-  // ): Promise<Claims> {
-  //   let parsedFormData = {};
-  //   try {
-  //     parsedFormData = JSON.parse(body.formData);
-  //   } catch (e) {
-  //       console.log("error",e);
-        
-  //     // ignore parse error
-  //   }
-
-  //   let s3FileUrl: string | null = null;
-
-  //   if (file) {
-  //   //   const fileName = `${Date.now()}-${file.originalname}`;
-  //   console.log("file",file);
-  //     const fileName = file.originalname;
-  //     const bucketName = process.env.AWS_BUCKET_NAME;
-  //     const region = process.env.AWS_REGION;
-
-  //     await s3.send(
-  //       new PutObjectCommand({
-  //         Bucket: bucketName,
-  //         Key: fileName,
-  //         Body: file.buffer,
-  //         ContentType: file.mimetype,
-  //         ServerSideEncryption: "AES256",
-        
-  //       //   SSEKMSKeyId: process.env.AWS_KMS_KEY_ID,
-  //       })
-  //     );
-
-  //     s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
-  //   }
-
-  //   return this.claimsService.createData({
-  //     ...body,
-  //     // formData: parsedFormData,
-  //     // filePath: s3FileUrl, // S3 URL
-  //      file_upload: s3FileUrl,
-  //   });
-  // }
+// @Controller("claims")
+// export class ClaimsController {
+//   constructor(private readonly claimsService:ClaimsService,
+//     private readonly mailService: MailService
+//   ) {}
 
 
 
-//   @Post("apply")
-// @UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
+
+// @Post("apply")
+// @UseInterceptors(AnyFilesInterceptor())
 // async applyClaims(
 //   @UploadedFile() file: Express.Multer.File,
 //   @Body() body: any
 // ): Promise<Claims> {
-//   console.log("Received body:", body);
+
 //   console.log("Received file:", file?.originalname);
 
 //   let s3FileUrl: string | null = null;
 
 //   if (file) {
-//     const fileName = file.originalname;
-//     const bucketName = process.env.AWS_BUCKET_NAME;
-//     const region = process.env.AWS_REGION;
+//     // clean filename using person name
+//     const personName = body.name
+//       ?.trim()
+//       .replace(/\s+/g, "-")
+//       .replace(/[^a-zA-Z0-9\-]/g, "");
+
+//     const ext = file.originalname.split(".").pop();
+//     const fileName = `${personName}.${ext}`;
+
+//     const bucketName = process.env.AWS_BUCKET_NAME!;
+//     const region = process.env.AWS_REGION!;
 
 //     await s3.send(
 //       new PutObjectCommand({
@@ -98,68 +63,172 @@ export class ClaimsController {
 //     );
 
 //     s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+
+//     // 🔥 SEND EMAIL WITH ORIGINAL FILE (NOT S3 URL)
+//     await this.mailService.sendFileMail(
+//       "kirthana@aayurcare.com",        // your email here
+//       "New Claim File Uploaded",
+//       `A new claim has been submitted by ${body.name}`,
+//       file                          // ⬅ original uploaded file
+//     );
 //   }
 
-//   return this.claimsService.createData({
-//     ...body,
+//   const payload = {
+//     name: body.name || "",
+//     phonenumber: body.phonenumber || "",
+//     emailid: body.emailid || "",
+//     kycdocument: body.kycdocument || "",
+//     consultationtype: body.consultationtype || "",
+//     accountHolderName: body.accountHolderName || "",
+//     bankAccountNumber: body.bankAccountNumber || "",
+//     reEnterAccountNumber: body.reEnterAccountNumber || "",
+//     IFSCCode: body.IFSCCode || "",
+//     BankName: body.BankName || "",
+//     BankBranchName: body.BankBranchName || "",
 //     file_upload: s3FileUrl,
-//   });
+//   };
+
+//   return this.claimsService.createData(payload);
 // }
 
+
+
 // }
 
-@Post("apply")
-@UseInterceptors(FileInterceptor("file", { storage: memoryStorage() }))
-async applyClaims(
-  @UploadedFile() file: Express.Multer.File,
-  @Body() body: any
-): Promise<Claims> {
-  console.log("Received body:", body);
-  console.log("Received file:", file?.originalname);
 
-  // Upload to S3 if file exists
-let s3FileUrl: string | null = null;
+import {
+  Body,
+  Controller,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
+} from "@nestjs/common";
 
-if (file) {
-  const fileName = `${Date.now()}-${file.originalname}`;
-  const bucketName = process.env.AWS_BUCKET_NAME!;
-  const region = process.env.AWS_REGION!;
+import { AnyFilesInterceptor } from "@nestjs/platform-express";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { Claims } from "./claim.entity";
+import { ClaimsService } from "./claim.service";
+import { MailService } from "./Mail.service";
 
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: bucketName,
-      Key: fileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ServerSideEncryption: "AES256",
-    })
-  );
-
-  s3FileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
-} else {
-  console.log("No file uploaded."); // <-- prevents undefined errors
+// Validate ENV
+if (
+  !process.env.AWS_REGION ||
+  !process.env.AWS_ACCESS_KEY_ID ||
+  !process.env.AWS_SECRET_ACCESS_KEY
+) {
+  throw new Error("AWS credentials or region not set in environment variables");
 }
 
+// Create S3 Client
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
-  // Ensure you provide all required fields
-  const payload = {
-    name: body.name || "",
-    phonenumber: body.phonenumber || "",
-    emailid: body.emailid || null,
-    kycdocument: body.kycdocument || null,
-    consultationtype: body.consultationtype || null,
-    accountHolderName: body.accountHolderName || "",
-    bankAccountNumber: body.bankAccountNumber || "",
-    reEnterAccountNumber: body.reEnterAccountNumber || "",
-    IFSCCode: body.IFSCCode || "",
-    BankName: body.BankName || "",
-    BankBranchName: body.BankBranchName || "",
-    file_upload: s3FileUrl,
-  };
+@Controller("claims")
+export class ClaimsController {
+  constructor(
+    private readonly claimsService: ClaimsService,
+    private readonly mailService: MailService
+  ) {}
 
-  return this.claimsService.createData(payload);
+  @Post("apply")
+  @UseInterceptors(AnyFilesInterceptor())
+  async applyClaims(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: any
+  ): Promise<Claims> {
+    console.log("📥 Received files:", files.map(f => f.fieldname));
+
+    const bucketName = process.env.AWS_BUCKET_NAME!;
+    const region = process.env.AWS_REGION!;
+
+    const personName =
+      body.name?.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9\-]/g, "") ||
+      "user";
+
+    let bankDocumentUrl: string | null = null;
+    let serviceFileUrls: any[] = [];
+
+    // 🔹 Extract files based on frontend field names
+    const bankDocument = files.find((f) => f.fieldname === "bankDocument");
+    const serviceDocs = files.filter((f) =>
+      f.fieldname.startsWith("serviceFile_")
+    );
+
+    // 🔥 Upload bank document
+    if (bankDocument) {
+      const ext = bankDocument.originalname.split(".").pop();
+      const fileName = `${personName}-bank.${ext}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: fileName,
+          Body: bankDocument.buffer,
+          ContentType: bankDocument.mimetype,
+          ServerSideEncryption: "AES256",
+        })
+      );
+
+      bankDocumentUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+    }
+
+    // 🔥 Upload service files dynamically
+    for (let i = 0; i < serviceDocs.length; i++) {
+      const file = serviceDocs[i];
+      const ext = file.originalname.split(".").pop();
+      const fileName = `${personName}-service-${i + 1}.${ext}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: fileName,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          ServerSideEncryption: "AES256",
+        })
+      );
+
+      serviceFileUrls.push({
+        serviceType: body[`serviceType_${i}`], // From frontend
+        fileUrl: `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`,
+      });
+    }
+
+    // 🔥 Send ALL files to your mail
+    for (const file of files) {
+      await this.mailService.sendFileMail(
+        "kirthana@aayurcare.com",
+        "New Claim File Uploaded",
+        `Claim submitted by ${body.name}`,
+        file
+      );
+    }
+
+    // 📌 Prepare DB payload
+    const payload = {
+      name: body.name || "",
+      phonenumber: body.phonenumber || "",
+      emailid: body.emailid || "",
+      servicetype: body.servicetype || "",
+      accountHolderName: body.accountHolderName || "",
+      bankAccountNumber: body.bankAccountNumber || "",
+      reEnterAccountNumber: body.reEnterAccountNumber || "",
+      IFSCCode: body.IFSCCode || "",
+      BankName: body.BankName || "",
+      BankBranchName: body.BankBranchName || "",
+
+      // FILES
+      bankDocumentUrl,
+      serviceDocuments: JSON.stringify(serviceFileUrls),
+    };
+
+    // Save to DB
+    return this.claimsService.createData(payload);
+  }
 }
 
-
-
-}

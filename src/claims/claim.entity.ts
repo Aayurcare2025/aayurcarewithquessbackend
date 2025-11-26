@@ -18,13 +18,8 @@ phonenumber:string;
 emailid:string;
 
 @Column()
-kycdocument:string;
+servicetype:string; 
 
-@Column()
-consultationtype:string; 
-
-@Column({ type: 'text', nullable: true })
-  file_upload: string;
 
 
 @Column()
@@ -34,8 +29,7 @@ accountHolderName:string;
 @Column()
 bankAccountNumber:string
 
-@Column()
-reEnterAccountNumber:string;
+
 
 
 @Column()

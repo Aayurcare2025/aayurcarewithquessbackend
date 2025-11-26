@@ -39,7 +39,7 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "mysql2": "^3.15.2",
-    "nodemailer": "^7.0.9",
+    "nodemailer": "^7.0.10",
     "payu-sdk": "^1.1.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

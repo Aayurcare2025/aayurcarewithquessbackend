@@ -6,7 +6,6 @@
 import { Claims } from './claim.entity';
 
 
-//
   @Injectable()
   export class ClaimsService {
       constructor(
@@ -22,12 +21,9 @@ import { Claims } from './claim.entity';
         name: payload.name,
         phonenumber: payload.phonenumber,
         emailid: payload.emailid,
-        kycdocument: payload.kycdocument,
-        consultationtype: payload.consultationtype,
-        file_upload: payload.file_upload,
+        servicetype: payload.servicetype,
         accountHolderName: payload.accountHolderName,
         bankAccountNumber: payload.bankAccountNumber,
-        reEnterAccountNumber: payload.reEnterAccountNumber,
         IFSCCode: payload.IFSCCode,
         BankName: payload.BankName,
         BankBranchName: payload.BankBranchName
