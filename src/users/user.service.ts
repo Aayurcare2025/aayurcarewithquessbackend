@@ -591,14 +591,14 @@
         port: Number(process.env.GODADDY_EMAIL_PORT),
         secure: true,
         auth: {
-          user: process.env.GODADDY_EMAIL_USER,
-          pass: process.env.GODADDY_EMAIL_PASS,
+          user: process.env.GODADDY_CONTACT_EMAIL_USER,
+          pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
         },
       });
 
       await transporter.sendMail({
-        from: this.configService.get('GODADDY_EMAIL_USER'),
-        to: this.configService.get('GODADDY_EMAIL_TO'),
+        from: this.configService.get('GODADDY_CONTACT_EMAIL_USER'),
+        to: this.configService.get('GODADDY_CONTACT_EMAIL_USER'),
         subject: `📞 Callback Request from ${name}`,
         html: `
           <h3>New Callback Request</h3>
