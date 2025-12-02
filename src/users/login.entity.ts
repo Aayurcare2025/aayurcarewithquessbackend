@@ -6,7 +6,7 @@ export class Login
    @PrimaryGeneratedColumn()
    id:number;
 
-   @Column({unique:true})
+   @Column({})
    phonenumber:string;
 
    
