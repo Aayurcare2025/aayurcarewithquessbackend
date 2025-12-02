@@ -8,5 +8,16 @@ export class Login
 
    @Column({unique:true})
    phonenumber:string;
+
    
+
+
+   @Column({type:'timestamp'})
+   login_date:Date;
+
+   //data 
+   
+
+
+
 }

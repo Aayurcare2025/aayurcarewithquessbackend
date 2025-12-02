@@ -18,6 +18,7 @@
   // }
 
   // bootstrap();
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
@@ -31,16 +32,26 @@ async function bootstrap() {
     credentials: true,
   });
 
+
+
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-  // await app.listen(6000, '0.0.0.0');
 
+
+  // await app.listen(6000, '0.0.0.0');
   //port number chnge 
+
+
     const port =6000;
+
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://localhost:${port}`);
+
+
+
 }
+ 
 
 
 bootstrap();

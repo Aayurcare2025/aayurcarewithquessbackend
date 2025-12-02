@@ -141,6 +141,7 @@ import { ClaimsModule } from './claims/claim.module';
 import { DashModule } from './Api/Dash.module';
 import { PaymentModule } from './Payment/payment.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -151,6 +152,7 @@ import { PaymentModule } from './Payment/payment.module';
     ClaimsModule,
     DashModule,
     PaymentModule,
+
     
 
     // ✅ Use ConfigService for DB settings

@@ -16,10 +16,8 @@ export class UsersController {
   async sendOtp(@Body('phone') phone: string) {
     console.log("phone" , phone);
     return await this.otpService.sendOtp(phone);
-
-
-
   }
+
 
 
 
@@ -32,8 +30,13 @@ export class UsersController {
     @Body('phone') phone: string,
     @Body('otp') otp: string,
   ) {
+
+
+   
+    console.log('verifyOtp called with:', phone, otp);
     return await this.otpService.verifyOtp(phone, otp);
   }
+
 
 
   
