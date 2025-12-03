@@ -252,7 +252,6 @@
 
 
 
-
   // }
   //     catch (err) {
   //       console.error('Error sending callback email:', err);
@@ -261,12 +260,6 @@
   //       );
   //     }
   //   }
-
-
-
-
-
-
   // }
 
 
@@ -277,7 +270,7 @@
   import { Repository } from 'typeorm';
   import { Login } from './login.entity';
   import { InjectRepository } from '@nestjs/typeorm';
-
+import { DashService } from 'src/Api/DashApi.service';
   @Injectable()
   export class  UserService {
     private readonly logger = new Logger(UserService.name);
@@ -286,8 +279,12 @@
     private otpStore = new Map<string, string>();
 
     constructor(private readonly configService: ConfigService,
+   
       @InjectRepository(Login)
       private readonly loginRepo: Repository<Login>,
+
+
+       private readonly DashService:DashService,
     ) {
       console.log("Loaded BSNL token:", process.env.BSNL_TOKEN);
     }
@@ -304,6 +301,12 @@
     private generateOtp() {
       return Math.floor(100000 + Math.random() * 900000).toString();
     }
+
+    //data has been send to 
+
+
+
+    
 
 
 
@@ -394,6 +397,7 @@
       };
 
       try {
+      
         const response = await axios.post(this.URL!, payload, {
           headers: {
             Authorization: this.BSNL_TOKEN,
@@ -435,6 +439,7 @@
 
       this.otpStore.delete(phone);
       await this.saveLogin(phone);
+      await this.DashService.getApplicantDataAndSave(phone);
 
 
 
@@ -502,7 +507,7 @@
 
   // Save login with full date+time
   const newLogin = this.loginRepo.create({
-    phonenumber: phone,
+    contact_number: phone,
     login_date: now,   // ⭐ full date-time stored
   });
 
@@ -617,6 +622,9 @@
       throw new BadRequestException('Failed to send callback request email.');
     }
   }
+
+
+
 
 
     

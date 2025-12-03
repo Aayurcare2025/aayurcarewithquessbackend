@@ -115,6 +115,7 @@ export class DashService {
 
       //data
       const applicant = {
+        
         applicant_id: res.applicant_id,
         first_name: res.first_name, 
         last_name: res.last_name,
@@ -132,6 +133,79 @@ export class DashService {
         designation: res.designation,
         work_location: res.work_location,
         company_name: res.employee_loan_status?.CompanyName,
+      };
+
+      //  Step 5: Save or update record
+      if (existing) {
+        await this.applicantRepo.update(existing.id, applicant);
+        console.log(` Updated existing record: ${res.first_name} (${res.applicant_id})`);
+      } else {
+        await this.applicantRepo.save(applicant);
+        console.log(` New record saved: ${res.first_name} (${res.applicant_id})`);
+      }
+
+      //Step 6: Return API response
+
+
+      return response.data;
+    } catch (error) {
+      console.error(' Error fetching or saving applicant:', error.response?.data || error.message);
+      throw new Error('Failed to fetch or save applicant data');
+    }
+  }
+
+
+
+
+
+
+  
+  
+  async getApplicantNameAndSave(applicant_id: string) {
+    try {
+
+      //ap
+      //  Step 1: Prepare API body:--
+      const data = {
+        partner_name: this.partnerName,
+        applicant_id,
+        date: new Date().toISOString().slice(0, 10),
+        partner_key: this.partnerKey,
+      };
+
+      const token = Buffer.from(JSON.stringify(data)).toString('base64');
+      console.log("token",token);
+      const body = { token, ...data };
+      
+
+      //  Step 2: Call external Dash API
+      const response = await axios.post(this.apiUrl, body);
+      const res = response.data.response;
+      console.log("res",res);
+
+      if (!res) throw new Error('Invalid response from Dash API');
+
+      //  Step 3: Check if this record already exists
+      const existing = await this.applicantRepo.findOne({
+        where: { applicant_id: res.applicant_id },
+      });
+
+      
+
+
+      
+      //  Step 4: Create/Update data object:
+
+
+      //data
+      const applicant = {
+        
+        applicant_id: res.applicant_id,
+        first_name: res.first_name, 
+        last_name: res.last_name,
+        contact_no: res.contact_no,
+        // contact_no: res.contact_no || contact_no,
+      
       };
 
       //  Step 5: Save or update record

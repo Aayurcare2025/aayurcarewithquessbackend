@@ -6,10 +6,17 @@ export class Login
    @PrimaryGeneratedColumn()
    id:number;
 
-   @Column({})
-   phonenumber:string;
+   @Column()
+   contact_number:string;
 
    
+   @Column()
+   first_name:string;
+
+   @Column()
+   applicant_id:string;
+
+
    @Column({type:'timestamp'})
    login_date:Date;
 

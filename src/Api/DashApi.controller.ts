@@ -39,12 +39,7 @@ export class DashController {
     if (!applicant_id ) {
       return { error: 'applicant_id is not required' };
     }
-
-
-    
     //process not set in env:
-
-    
     const data = await this.dashService.getApplicantDataAndSave(applicant_id);
 
     return {
@@ -53,4 +48,26 @@ export class DashController {
       data,
     };
   }
+
+
+
+  
+  // @Get('applicant')
+  // async getApplicantName(
+  //   @Query('applicant_id') applicant_id: string,
+  //   // @Query('contact_no') contact_no: string,
+   
+  // ) {
+  //   if (!applicant_id ) {
+  //     return { error: 'applicant_id is not required' };
+  //   }
+  //   //process not set in env:
+  //   const data = await this.dashService.getApplicantNameAndSave(applicant_id);
+
+  //   return {
+  //     message: ' Data fetched and saved successfully',
+  //     applicant_id,
+  //     data,
+  //   };
+  // }
 }
