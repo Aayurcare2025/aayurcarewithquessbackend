@@ -436,7 +436,7 @@ import { DashService } from 'src/Api/DashApi.service';
         throw new BadRequestException('Invalid OTP');
 
       this.otpStore.delete(phone);
-      await this.saveLogin(phone);
+      // await this.saveLogin(phone);
 
 
 
@@ -489,30 +489,30 @@ import { DashService } from 'src/Api/DashApi.service';
   // }
 
 
-  async saveLogin(phone: string) {
-  const now = new Date();  
-  const todayDateOnly = now.toISOString().split("T")[0]; 
+//   async saveLogin(phone: string) {
+//   const now = new Date();  
+//   const todayDateOnly = now.toISOString().split("T")[0]; 
 
-//call applicant:
+// //call applicant:
 
     
-  // Find if user already logged in today
-  const existing = await this.loginRepo
-    .createQueryBuilder("login")
-    .where("login.phonenumber = :phone", { phone })
-    .andWhere("DATE(login.login_date) = :today", { today: todayDateOnly })
-    .getOne();
+//   // Find if user already logged in today
+//   const existing = await this.loginRepo
+//     .createQueryBuilder("login")
+//     .where("login.phonenumber = :phone", { phone })
+//     .andWhere("DATE(login.login_date) = :today", { today: todayDateOnly })
+//     .getOne();
 
-  if (existing) return existing;
+//   if (existing) return existing;
 
-  // Save login with full date+time
-  const newLogin = this.loginRepo.create({
-    phonenumber: phone,
-    login_date: now,   // ⭐ full date-time stored
-  });
+//   // Save login with full date+time
+//   const newLogin = this.loginRepo.create({
+//     phonenumber: phone,
+//     login_date: now,   // ⭐ full date-time stored
+//   });
 
-  return await this.loginRepo.save(newLogin);
-}
+//   return await this.loginRepo.save(newLogin);
+// }
 
 
 // async saveLogin(phone: string) {

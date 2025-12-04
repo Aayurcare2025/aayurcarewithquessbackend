@@ -9,14 +9,7 @@ export class Login
    @Column()
    phonenumber:string;
 
-   @Column()
-   applicantId:string;
-
    
-   @Column()
-   first_name:string;
-
-
    @Column({type:'timestamp'})
    login_date:Date;
 
