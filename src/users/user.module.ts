@@ -8,19 +8,25 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserService } from './user.service';
 import { UsersController } from './user.controller';
 import { Login } from './login.entity';
-import { DailyReportService } from './DailyReportService';
-import { ScheduleModule } from '@nestjs/schedule';
+
+
+import { DashModule } from 'src/Api/Dash.module';
 
 
 @Module({
   imports:[TypeOrmModule.forFeature([User,Login]),
-  ScheduleModule.forRoot(),
+  DashModule,
+
 JwtModule.register({
       secret: 'secret', 
       signOptions: { expiresIn: '1h' },
     }),],
-  providers: [UserService,DailyReportService],
+  providers: [UserService,],
   controllers:[UsersController],
-  exports:[UserService,DailyReportService],
+  exports:[UserService,],
 })
 export class UsersModule {}
+
+
+
+

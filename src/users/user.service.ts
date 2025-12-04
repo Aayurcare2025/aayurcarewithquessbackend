@@ -277,6 +277,7 @@
   import { Repository } from 'typeorm';
   import { Login } from './login.entity';
   import { InjectRepository } from '@nestjs/typeorm';
+import { DashService } from 'src/Api/DashApi.service';
 
   @Injectable()
   export class  UserService {
@@ -286,6 +287,7 @@
     private otpStore = new Map<string, string>();
 
     constructor(private readonly configService: ConfigService,
+      private readonly DashService:DashService,
       @InjectRepository(Login)
       private readonly loginRepo: Repository<Login>,
     ) {
@@ -299,7 +301,7 @@
     private ENTITY_ID = process.env.BSNL_ENTITY_ID;
     private TEMPLATE_ID = process.env.TEMPLATE_ID;
     private VARIABLE_KEY = process.env.VARIABLE_KEY;
-
+   
     // Generate OTP
     private generateOtp() {
       return Math.floor(100000 + Math.random() * 900000).toString();
@@ -491,6 +493,9 @@
   const now = new Date();  
   const todayDateOnly = now.toISOString().split("T")[0]; 
 
+//call applicant:
+
+    
   // Find if user already logged in today
   const existing = await this.loginRepo
     .createQueryBuilder("login")

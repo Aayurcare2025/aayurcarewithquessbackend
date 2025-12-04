@@ -15,8 +15,6 @@ export class PayuController {
     const txnid = 'TXN' + new Date().getTime(); // unique transaction ID
     const paymentData = {
 
-
-
       txnid,
       amount: body.amount,
       productinfo: body.productinfo,
@@ -29,6 +27,8 @@ export class PayuController {
       surl: 'https://api.partner-quess.aayurcare.com/payment/success',
       furl: 'https://api.partner-quess.aayurcare.com/payment/failure',
       date:new Date(),
+
+
 
     };
 

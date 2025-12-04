@@ -53,6 +53,10 @@ export class Applicant {
   @Column({ nullable: true })
   company_name: string;
 
+
+ @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+created_at: Date;
+
   // 🟣 NEW: store everything from Dash response
 //   @Column({ type: 'json', nullable: true })
 //   full_response: object;

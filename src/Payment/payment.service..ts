@@ -145,7 +145,7 @@ async getTodayPayments() {
     });
     
   console.log("Daily Report Sent!");
-  }
+  }zz
 }
 
 

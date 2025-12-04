@@ -50,15 +50,19 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Applicant } from './dash.entity';
-
+import * as ExcelJS from 'exceljs';
+import * as nodemailer from 'nodemailer';
+import { Cron } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class DashService {
   constructor(
   
     @InjectRepository(Applicant)
     private readonly applicantRepo: Repository<Applicant>,
+      private readonly configService: ConfigService,
   ) {}
 
 //error handling if entering employee details is wrong:
@@ -133,6 +137,7 @@ export class DashService {
         designation: res.designation,
         work_location: res.work_location,
         company_name: res.employee_loan_status?.CompanyName,
+        created_at: new Date()
       };
 
       //  Step 5: Save or update record
@@ -155,75 +160,82 @@ export class DashService {
   }
 
 
+@Cron('0 0 12-23 * * *')
 
-
-
-
-  
-  
-  async getApplicantNameAndSave(applicant_id: string) {
+  async sendApplicantExcel() {
     try {
+      console.log("⏳ Cron: Generating Applicant Excel Report (12 PM)");
+ 
+      const startOfToday = new Date();
+startOfToday.setHours(0, 0, 0, 0);
 
-      //ap
-      //  Step 1: Prepare API body:--
-      const data = {
-        partner_name: this.partnerName,
-        applicant_id,
-        date: new Date().toISOString().slice(0, 10),
-        partner_key: this.partnerKey,
-      };
+const endOfToday = new Date();
+endOfToday.setHours(23, 59, 59, 999);
 
-      const token = Buffer.from(JSON.stringify(data)).toString('base64');
-      console.log("token",token);
-      const body = { token, ...data };
-      
+const applicants = await this.applicantRepo.find({
+  where: {
+    created_at: Between(startOfToday, endOfToday)
+  },
+  select: ["first_name", "contact_no"]
+});
 
-      //  Step 2: Call external Dash API
-      const response = await axios.post(this.apiUrl, body);
-      const res = response.data.response;
-      console.log("res",res);
 
-      if (!res) throw new Error('Invalid response from Dash API');
+      if (!applicants.length) {
+        console.log("⚠ No applicant data found.");
+        return;
+      }
 
-      //  Step 3: Check if this record already exists
-      const existing = await this.applicantRepo.findOne({
-        where: { applicant_id: res.applicant_id },
+
+    
+      // 2️⃣ Create Excel
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Applicants");
+
+      sheet.columns = [
+        { header: "First Name", key: "first_name", width: 30 },
+        { header: "Contact Number", key: "contact_no", width: 20 },
+      ];
+     
+      applicants.forEach(row => sheet.addRow(row));
+
+     const excelBuffer=Buffer.from(await workbook.xlsx.writeBuffer()) ;
+      // 3️⃣ Email sending
+      const transporter = nodemailer.createTransport({
+        host: this.configService.get("GODADDY_EMAIL_HOST"),
+        port: Number(this.configService.get("GODADDY_EMAIL_PORT")),
+        secure: true,
+        auth: {
+          user: this.configService.get("GODADDY_EMAIL_USER"),
+          pass: this.configService.get("GODADDY_EMAIL_PASS"),
+        },
       });
 
+      await transporter.sendMail({
+        from: this.configService.get("GODADDY_EMAIL_USER"),
+        to:this.configService.get("GODADDY_PNO_EMAIL_USER_TO"),
+        subject: "Daily Login Report",
+        text: "Attached is the daily login daily report",
+        attachments: [
+          {
+            filename: "Applicant_Report_12PM.xlsx",
+           content:excelBuffer,
+          },
+        ],
+      });
       
+      console.log("📨 Email sent successfully!");
 
-
-      
-      //  Step 4: Create/Update data object:
-
-
-      //data
-      const applicant = {
-        
-        applicant_id: res.applicant_id,
-        first_name: res.first_name, 
-        last_name: res.last_name,
-        contact_no: res.contact_no,
-        // contact_no: res.contact_no || contact_no,
-      
-      };
-
-      //  Step 5: Save or update record
-      if (existing) {
-        await this.applicantRepo.update(existing.id, applicant);
-        console.log(` Updated existing record: ${res.first_name} (${res.applicant_id})`);
-      } else {
-        await this.applicantRepo.save(applicant);
-        console.log(` New record saved: ${res.first_name} (${res.applicant_id})`);
-      }
-
-      //Step 6: Return API response
-
-
-      return response.data;
     } catch (error) {
-      console.error(' Error fetching or saving applicant:', error.response?.data || error.message);
-      throw new Error('Failed to fetch or save applicant data');
+      console.error(" Error in cron:", error);
     }
   }
+
+
+
+  
+
+
+
+  
+  
 }
