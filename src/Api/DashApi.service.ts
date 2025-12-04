@@ -160,8 +160,8 @@ export class DashService {
   }
 
 
-@Cron('0 0 12-23 * * *')
-
+// @Cron('0 0 12-23 * * *')
+@Cron('0 59 23 * * *')
   async sendApplicantExcel() {
     try {
       console.log("⏳ Cron: Generating Applicant Excel Report (12 PM)");
