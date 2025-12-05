@@ -53,9 +53,11 @@ export class Applicant {
   @Column({ nullable: true })
   company_name: string;
 
+  @Column({ type: 'timestamptz', default: () => "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata'" })
+  created_at: Date;
 
- @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-created_at: Date;
+
+
 
   // 🟣 NEW: store everything from Dash response
 //   @Column({ type: 'json', nullable: true })

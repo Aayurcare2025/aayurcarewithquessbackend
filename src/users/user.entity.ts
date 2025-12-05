@@ -53,7 +53,10 @@ export class User {
  @Column({ type: 'varchar', length: 6, nullable: true })
   otpCode: string | null;
 
-  // OTP expiry — use datetime
+  // OTP expiry — use datet ime
   @Column({ type: 'datetime', nullable: true })
   otpExpiresAt: Date | null;
+
+
+  
 }

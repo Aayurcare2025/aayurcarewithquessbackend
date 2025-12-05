@@ -99,7 +99,6 @@ export class DashService {
       console.log("token",token);
       const body = { token, ...data };
       
-
       //  Step 2: Call external Dash API
       const response = await axios.post(this.apiUrl, body);
       const res = response.data.response;
@@ -112,7 +111,6 @@ export class DashService {
         where: { applicant_id: res.applicant_id },
       });
       
-      //  Step 4: Create/Update data object:
 
 
       //data
@@ -135,7 +133,9 @@ export class DashService {
         designation: res.designation,
         work_location: res.work_location,
         company_name: res.employee_loan_status?.CompanyName,
-        created_at: new Date()
+        created_at:new Date()
+
+        
       };
 
       //  Step 5: Save or update record
@@ -158,11 +158,14 @@ export class DashService {
   }
 
 
-// @Cron('0 0 12-23 * * *')
-@Cron('0 59 23 * * *')
+// // @Cron('0 0 12-23 * * *')
+// @Cron('0 59 23 * * *')
+@Cron('0 59 23 * * *', {
+  timeZone: 'Asia/Kolkata',
+})
   async sendApplicantExcel() {
     try {
-      console.log("⏳ Cron: Generating Applicant Excel Report (12 PM)");
+      console.log(" Cron: Generating Applicant Excel Report (12 PM)");
  
       const startOfToday = new Date();
 startOfToday.setHours(0, 0, 0, 0);
@@ -178,15 +181,13 @@ const applicants = await this.applicantRepo.find({
   where: {
     created_at: Between(startOfToday, endOfToday)
   },
-  select: ["first_name", "contact_no"]
+  select: ["applicant_id","first_name","last_name", "contact_no","email_id","City","DOB","gender","Pincode","State","City","customer_name","DOJ","employee_status","designation","work_location","company_name","created_at"]
 });
-
 
       if (!applicants.length) {
         console.log("⚠ No applicant data found.");
         return;
       }
-
 
     
       // 2️⃣ Create Excel
@@ -194,8 +195,23 @@ const applicants = await this.applicantRepo.find({
       const sheet = workbook.addWorksheet("Applicants");
 
       sheet.columns = [
+        {header:"Applicant Id",key:"applicant_id",width:20},
         { header: "First Name", key: "first_name", width: 30 },
-        { header: "Contact Number", key: "contact_no", width: 20 },
+        {header:"Last Name",key:"last_name",width:30},
+        { header: "Contact Number", key: "contact_no", width: 30 },
+        {header:"Email id",key:"email_id",width:30},
+        {header:"DOB",key:"DOB",width:30},
+        {header:"gender",key:"gender",width:30},
+        {header:"Pincode",key:"Pincode",width:30},
+        {header:"City" ,key:"City",width:30},
+        {header:"State",key:"State",width:30},
+        {header:"Customer Name",key:"customer_name",width:30},
+        {header:"DOJ",key:"DOJ",width:30},
+        {header:"Employee Status",key:"employee_status",width:30},
+        {header:"Designation",key:"designation",width:30},
+        {header:"Work Location",key:"work_location",width:30},
+        {header:"Company Name",key:"company_name",width:30},
+        {header:"Login Time",key:"created_at",width:20},
       ];
      
       applicants.forEach(row => sheet.addRow(row));
