@@ -15,6 +15,7 @@ export class PayuService {
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
   ) {}
+
   private key = process.env.PAYU_KEY;
   private salt = process.env.PAYU_SALT;
   private payuUrl = process.env.PAYU_BASE_URL ;
@@ -39,6 +40,9 @@ export class PayuService {
       hash,
       payuUrl: this.payuUrl + '/_payment',
     };
+
+
+
   }
 
   // ✅ Step 3: Verify PayU callback hash
@@ -61,6 +65,8 @@ verifyHash(response: any): boolean {
       status: "Success",
       payment_date: new Date(),
     });
+
+
 
     return this.paymentRepo.save(payment);
 
@@ -145,7 +151,40 @@ async getTodayPayments() {
     });
     
   console.log("Daily Report Sent!");
-  }zz
+
+
+
+
+
+  }
+
+
+async getApplicantFromDB(applicantId: string) {
+  return await this.paymentRepo.manager.getRepository("Applicant").findOne({
+    where: { applicant_id: applicantId }
+  });
+}
+
+
+
+generateVirtualCardId(applicantId: string) {
+  applicantId = applicantId.toString();
+  
+
+  const first2 = applicantId.slice(0, 2);
+  const first4 = applicantId.slice(0, 4);
+  const last4 = applicantId.slice(-4);
+
+
+  const now = new Date();
+  const YY = now.getFullYear().toString().slice(-2);
+  const DD = now.getDate().toString().padStart(2, "0");
+
+  return `AQ${first2}-${first4}-${last4}-${YY}${DD}`;
+}
+
+
+ 
 }
 
 

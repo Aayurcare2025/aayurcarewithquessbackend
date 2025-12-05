@@ -92,6 +92,8 @@ export class DashService {
         date: new Date().toISOString().slice(0, 10),
         partner_key: this.partnerKey,
       };
+     
+      
 
       const token = Buffer.from(JSON.stringify(data)).toString('base64');
       console.log("token",token);
@@ -109,10 +111,6 @@ export class DashService {
       const existing = await this.applicantRepo.findOne({
         where: { applicant_id: res.applicant_id },
       });
-
-      
-
-
       
       //  Step 4: Create/Update data object:
 
@@ -170,7 +168,11 @@ export class DashService {
 startOfToday.setHours(0, 0, 0, 0);
 
 const endOfToday = new Date();
+
 endOfToday.setHours(23, 59, 59, 999);
+
+
+
 
 const applicants = await this.applicantRepo.find({
   where: {
@@ -228,6 +230,7 @@ const applicants = await this.applicantRepo.find({
     } catch (error) {
       console.error(" Error in cron:", error);
     }
+
   }
 
 

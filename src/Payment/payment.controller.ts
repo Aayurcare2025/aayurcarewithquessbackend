@@ -15,6 +15,7 @@ export class PayuController {
     const txnid = 'TXN' + new Date().getTime(); // unique transaction ID
     const paymentData = {
 
+      
       txnid,
       amount: body.amount,
       productinfo: body.productinfo,
@@ -24,12 +25,15 @@ export class PayuController {
       firstname: body.firstname || '',
       email: body.email || '',
       phone: body.phonenumber || '',
+      applicant_id:body.applicant_id || '',
       surl: 'https://api.partner-quess.aayurcare.com/payment/success',
       furl: 'https://api.partner-quess.aayurcare.com/payment/failure',
       date:new Date(),
 
 
 
+
+//data has to
     };
 
     const payuData = await this.payuService.initiatePayment(paymentData);
@@ -77,6 +81,7 @@ async handleSuccess(@Body() body, @Res() res: Response) {
     firstname: body.firstname,
     email: body.email,
     phone: body.phone,
+    applicant_id:body.applicant_id,
     amount: body.amount,
     txnid: body.txnid,
     productinfo: body.productinfo,
