@@ -65,12 +65,19 @@ export class DashService {
       private readonly configService: ConfigService,
   ) {}
 
+
+
+
 //error handling if entering employee details is wrong:
 //like contact no or first name or applicant isw wrong:
 
   private readonly partnerName = 'aayurcare';
   private readonly partnerKey = 'a0368ae2-f9af-48cd-b55d-136402ccddd0';
   private readonly apiUrl = 'https://api.hamarabenefits.com/api/v1/submitLoanDetail';
+
+
+
+
 
   /**
    * Fetch data from Dash API and save it in DB
@@ -86,6 +93,9 @@ export class DashService {
 
       //ap
       //  Step 1: Prepare API body:--
+
+
+
       const data = {
         partner_name: this.partnerName,
         applicant_id,
@@ -136,7 +146,9 @@ export class DashService {
         designation: res.designation,
         work_location: res.work_location,
         company_name: res.employee_loan_status?.CompanyName,
-        created_at:new Date()
+        // created_at:new Date()
+      created_at: new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata" })
+      
 
 
 
@@ -185,8 +197,6 @@ const endOfToday = new Date();
 
 endOfToday.setHours(23, 59, 59, 999);
 
-      
-
 
 const applicants = await this.applicantRepo.find({
   where: {
@@ -215,13 +225,13 @@ const applicants = await this.applicantRepo.find({
 });
 
 console.log("excel applicant",applicants);
-
       if (!applicants.length) {
         console.log("⚠ No applicant data found.");
         return;
       }
 
       // 2️⃣ Create Excel 
+
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("Applicants");
 
@@ -259,7 +269,6 @@ console.log("excel applicant",applicants);
           pass: this.configService.get("GODADDY_EMAIL_PASS"),
         },
       });
-
 
       await transporter.sendMail({
         from: this.configService.get("GODADDY_EMAIL_USER"),
