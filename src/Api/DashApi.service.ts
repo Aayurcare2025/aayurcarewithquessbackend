@@ -179,11 +179,10 @@ export class DashService {
       throw new Error('Failed to fetch or save applicant data');
     }
   }
-
-
+59
 // // @Cron('0 0 12-23 * * *')
 // @Cron('0 59 23 * * *')
-@Cron('0 0 17 * * *', {
+@Cron('0 59 23 * * *', {
   timeZone: 'Asia/Kolkata',
 })
   async sendApplicantExcel() {
