@@ -106,10 +106,13 @@ export class DashService {
 
       if (!res) throw new Error('Invalid response from Dash API');
 
+   
       //  Step 3: Check if this record already exists
       const existing = await this.applicantRepo.findOne({
         where: { applicant_id: res.applicant_id },
       });
+
+
       
 
 
@@ -123,7 +126,7 @@ export class DashService {
         // contact_no: res.contact_no || contact_no,
         email_id: res.email_id || '',
         DOB: res.DOB,
-        gender: res.gender,
+        gender: res.gender, 
         Pincode: res.Pincode,
         City: res.City,
         State: res.State,
@@ -135,10 +138,18 @@ export class DashService {
         company_name: res.employee_loan_status?.CompanyName,
         created_at:new Date()
 
+
+
+
+        
         
       };
 
-      //  Step 5: Save or update record
+      //  Step 5: Save or update 
+      
+
+
+
       if (existing) {
         await this.applicantRepo.update(existing.id, applicant);
         console.log(` Updated existing record: ${res.first_name} (${res.applicant_id})`);
@@ -160,7 +171,7 @@ export class DashService {
 
 // // @Cron('0 0 12-23 * * *')
 // @Cron('0 59 23 * * *')
-@Cron('0 59 23 * * *', {
+@Cron('0 0 15 * * *', {
   timeZone: 'Asia/Kolkata',
 })
   async sendApplicantExcel() {
@@ -174,23 +185,43 @@ const endOfToday = new Date();
 
 endOfToday.setHours(23, 59, 59, 999);
 
-
+      
 
 
 const applicants = await this.applicantRepo.find({
   where: {
     created_at: Between(startOfToday, endOfToday)
   },
-  select: ["applicant_id","first_name","last_name", "contact_no","email_id","City","DOB","gender","Pincode","State","City","customer_name","DOJ","employee_status","designation","work_location","company_name","created_at"]
+ select: [
+  "applicant_id",
+  "first_name",
+  "last_name",
+  "contact_no",
+  "email_id",
+  "DOB",
+  "gender",
+  "Pincode",
+  "City",
+  "State",
+  "customer_name",
+  "DOJ",
+  "employee_status",
+  "designation",
+  "work_location",
+  "company_name",
+  "created_at"
+]
+
 });
+
+console.log("excel applicant",applicants);
 
       if (!applicants.length) {
         console.log("⚠ No applicant data found.");
         return;
       }
 
-    
-      // 2️⃣ Create Excel
+      // 2️⃣ Create Excel 
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("Applicants");
 
@@ -215,9 +246,10 @@ const applicants = await this.applicantRepo.find({
       ];
      
       applicants.forEach(row => sheet.addRow(row));
+      
 
      const excelBuffer=Buffer.from(await workbook.xlsx.writeBuffer()) ;
-      // 3️⃣ Email sending
+      // 3️⃣ Email sending:-
       const transporter = nodemailer.createTransport({
         host: this.configService.get("GODADDY_EMAIL_HOST"),
         port: Number(this.configService.get("GODADDY_EMAIL_PORT")),
@@ -227,6 +259,7 @@ const applicants = await this.applicantRepo.find({
           pass: this.configService.get("GODADDY_EMAIL_PASS"),
         },
       });
+
 
       await transporter.sendMail({
         from: this.configService.get("GODADDY_EMAIL_USER"),
@@ -240,6 +273,9 @@ const applicants = await this.applicantRepo.find({
           },
         ],
       });
+
+
+
       
       console.log("📨 Email sent successfully!");
 
