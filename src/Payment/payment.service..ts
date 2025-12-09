@@ -430,8 +430,8 @@ export class PayuService {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.SUPPORT_EMAIL,
-        pass: process.env.SUPPORT_EMAIL_PASS,
+        user: process.env.GODADDY_CONTACT_EMAIL_USER,
+        pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
       },
     });
 
