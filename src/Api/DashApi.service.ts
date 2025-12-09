@@ -295,7 +295,7 @@ export class DashService {
 
 
 
-@Cron('0 30 10 * * *', {
+@Cron('0 0 11 * * *', {
   timeZone: 'Asia/Kolkata',
 })
   async sendApplicantExcel() {
