@@ -7,6 +7,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
 import * as nodemailer from 'nodemailer';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 @Injectable()
 export class PayuService {
 
@@ -67,8 +68,33 @@ verifyHash(response: any): boolean {
     });
 
 
+    // const saved=await this.paymentRepo.save(payment);
+
+    // const applicant=await this.getApplicantFromDB(data.applicant_id)
+    
+    //   if (applicant) {
+    // applicant.membership_id = this.generateMembershipId(applicant.applicant_id);
+    // applicant.virtual_card_number = this.generateVirtualCardId(
+    //   applicant.applicant_id,
+    //   applicant.dob
+    // );
+
+    // Generate PDF card
+    // const fileName = await this.generateCardPdf(applicant);
+    // console.log("fileName",fileName);
+
+
+    // Optionally email the PDF to customer
+  //   await this.sendCardEmail(applicant.email, fileName);
+  // }
+
+// return saved;
+
 
     return this.paymentRepo.save(payment);
+
+
+
 
 }
 
@@ -87,6 +113,9 @@ async getTodayPayments() {
         payment_date: Between(today, tomorrow),
       },
     });
+
+
+
   }
 
 
@@ -154,8 +183,6 @@ async getTodayPayments() {
 
 
 
-
-
   }
 
 
@@ -166,22 +193,101 @@ async getApplicantFromDB(applicantId: string) {
 }
 
 
-
-generateVirtualCardId(applicantId: string) {
+generateVirtualCardId(applicantId: string,dob:string) {
   applicantId = applicantId.toString();
-  
-
   const first2 = applicantId.slice(0, 2);
   const first4 = applicantId.slice(0, 4);
   const last4 = applicantId.slice(-4);
 
-
-  const now = new Date();
+  const now = new Date(dob);
   const YY = now.getFullYear().toString().slice(-2);
   const DD = now.getDate().toString().padStart(2, "0");
 
   return `AQ${first2}-${first4}-${last4}-${YY}${DD}`;
 }
+
+
+
+generateMembershipId(applicantId: string) {
+  return "AQ" + applicantId.toString().slice(0, 2);
+}
+
+
+
+
+
+
+
+
+async generateCardPdf(applicant: any) {
+
+  const pdfDoc = await PDFDocument.create();
+
+  const page1 = pdfDoc.addPage([243,153]);
+
+  const page2 = pdfDoc.addPage([243,153]);
+
+  const frontImageBytes = fs.readFileSync('./FrontQuess.png');
+  const backImageBytes  = fs.readFileSync('./BackQuess.png');
+
+  const frontImg = await pdfDoc.embedPng(frontImageBytes);
+  const backImg  = await pdfDoc.embedPng(backImageBytes);
+
+
+  page1.drawImage(frontImg, { x: 0, y: 0, width: 243, height: 153 });
+
+  const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  page1.drawText(applicant.firstname, { x: 20, y:15, size: 14, font, color: rgb(1,1,1) });
+  page1.drawText(applicant.virtual_card_number, { x: 20, y: 70, size: 14, font, color: rgb(1,1,1) });
+ page1.drawText(applicant.month, { x: 110, y:50, size: 7, font, color: rgb(1,1,1) });
+  page1.drawText(applicant.year, { x: 130, y: 50, size: 7, font, color: rgb(1,1,1) });
+  page2.drawImage(backImg, { x: 0, y: 0, width: 243, height: 153 });
+
+  
+  page2.drawText(applicant.firstname, { x: 35, y: 45, size: 6, font, color: rgb(1,1,1) });
+  page2.drawText(applicant.dob, { x: 134, y: 45, size: 6, font, color: rgb(1,1,1) });
+  page2.drawText(applicant.membership_id, { x: 178, y: 45, size: 6, font, color: rgb(1,1,1) });
+
+  const pdfBytes = await pdfDoc.save();
+
+  const fileName = `Card-${applicant.applicant_id}.pdf`;
+
+  fs.writeFileSync(fileName, pdfBytes);
+
+  console.log("PDF generated:", fileName);
+}
+
+
+
+
+
+async sendCardEmail(email: string, fileName: string) {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.SUPPORT_EMAIL,
+      pass: process.env.SUPPORT_EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.SUPPORT_EMAIL,
+    to: email,
+    subject: "Your Aayur Care Membership Card",
+    text: "Attached is your membership card PDF.",
+    attachments: [
+      { filename: fileName, path: `./${fileName}` }
+    ],
+  });
+
+  console.log("Membership card sent to:", email);
+}
+
+
+
+
+
 
 
  

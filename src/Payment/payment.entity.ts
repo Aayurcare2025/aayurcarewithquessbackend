@@ -24,17 +24,6 @@
 
 //     @Column({nullable:true})
 //     productinfo:string;
-
-    
-
-
-
-
-
-
-
-
-
     
 // }
 
