@@ -437,7 +437,7 @@ import { DashService } from 'src/Api/DashApi.service';
         throw new BadRequestException('Invalid OTP');
 
       this.otpStore.delete(phone);
-      // await this.saveLogin(phone);
+      await this.saveLogin(phone);
 
 
 
@@ -450,18 +450,18 @@ import { DashService } from 'src/Api/DashApi.service';
       };
     }
 
-  // async saveLogin(phone: string) {
-  //   const existing = await this.loginRepo.findOne({
-  //     where: { phonenumber: phone }
-  //   });
+  async saveLogin(phone: string) {
+    const existing = await this.loginRepo.findOne({
+      where: { phonenumber: phone }
+    });
 
-  //   // ❌ Already exists → don't save again
-  //   if (existing) return existing;
+    //  Already exists → don't save again
+    if (existing) return existing;
 
-  //   // ✅ Save new login
-  //   const newUser = this.loginRepo.create({ phonenumber: phone });
-  //   return await this.loginRepo.save(newUser);
-  // }
+    //  Save new login
+    const newUser = this.loginRepo.create({ phonenumber: phone });
+    return await this.loginRepo.save(newUser);
+  }
 
 
 
