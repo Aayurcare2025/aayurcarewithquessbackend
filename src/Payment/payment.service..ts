@@ -377,6 +377,7 @@ const payment = this.paymentRepo.create({
     const saved = await this.paymentRepo.save(payment);
 
     // FETCH applicant only for data (not storing anything)
+    
     // const applicant = await this.getApplicantFromDB(data.applicant_id);
 
     // if (applicant) {
