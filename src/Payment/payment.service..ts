@@ -357,29 +357,45 @@ export class PayuService {
     const saved = await this.paymentRepo.save(payment);
 
     // FETCH applicant only for data (not storing anything)
-    const applicant = await this.getApplicantFromDB(data.applicant_id);
+    // const applicant = await this.getApplicantFromDB(data.applicant_id);
 
-    if (applicant) {
-      // Generate values dynamically
-      const membership_id = this.generateMembershipId(applicant.applicant_id);
-      const virtual_card_number = this.generateVirtualCardId(
-        applicant.applicant_id,
-        applicant.dob
-      );
-      const bottomvalue = this.generateBottomValue(applicant.applicant_id);
-      const { month, year } = this.getExpiryMonthYear();
+    // if (applicant) {
+    //   // Generate values dynamically
+    //   const membership_id = this.generateMembershipId(applicant.applicant_id);
+    //   const virtual_card_number = this.generateVirtualCardId(
+    //     applicant.applicant_id,
+    //     applicant.dob
+    //   );
+    //   const bottomvalue = this.generateBottomValue(applicant.applicant_id);
+    //   const { month, year } = this.getExpiryMonthYear();
 
-      await this.generateCardPdf({
-        ...applicant,
-        membership_id,
-        virtual_card_number,
-        bottomvalue,
-        month,
-        year
-      });
+      // await this.generateCardPdf({
+      //   ...applicant,
+      //   membership_id,
+      //   virtual_card_number,
+      //   bottomvalue,
+      //   month,
+      //   year
+      // });
 
-      await this.sendCardEmail(applicant.email, `Card-${applicant.applicant_id}.pdf`);
-    }
+
+//       await this.generateCardPdf({
+//   applicant_id: applicant.applicant_id,
+//   firstname: applicant.first_name ?? "",
+//   lastname: applicant.last_name ?? "",
+//   dob: applicant.DOB ?? "",
+//   email: applicant.email_id ?? "",
+//   phone: applicant.contact_no ?? "",
+//   membership_id,
+//   virtual_card_number,
+//   bottomvalue,
+//   month,
+//   year
+// });
+
+
+    //   await this.sendCardEmail(applicant.email, `Card-${applicant.applicant_id}.pdf`);
+    // }
 
     return saved;
   }
@@ -405,7 +421,7 @@ export class PayuService {
 
     const filename = `payments-${Date.now()}.csv`;
     await this.generateCSV(filename, payments);
-    await this.sendEmail(filename);
+    // await this.sendEmail(filename);
     fs.unlinkSync(filename);
   }
 
@@ -426,23 +442,25 @@ export class PayuService {
     await csvWriter.writeRecords(data);
   }
 
-  async sendEmail(filename: string) {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GODADDY_CONTACT_EMAIL_USER,
-        pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
-      },
-    });
+  // async sendEmail(filename: string) {
+  //   const transporter = nodemailer.createTransport({
+  //     host: "smtpout.secureserver.net",
+  // port: 465,
+  // secure: true, // use SSL
+  // auth: {
+  //   user: process.env.GODADDY_CONTACT_EMAIL_USER,
+  //   pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
+  // },
+  //   });
 
-    await transporter.sendMail({
-      from: process.env.SUPPORT_EMAIL,
-      to: "contact@aayurcare.com",
-      subject: "Daily Payment Report",
-      text: "Attached today’s payment report.",
-      attachments: [{ filename, path: `./${filename}` }],
-    });
-  }
+  //   await transporter.sendMail({
+  //     from: process.env.SUPPORT_EMAIL,
+  //     to: "contact@aayurcare.com",
+  //     subject: "Daily Payment Report",
+  //     text: "Attached today’s payment report.",
+  //     attachments: [{ filename, path: `./${filename}` }],
+  //   });
+  // }
 
   // ----------------- FETCH APPLICANT -----------------
   async getApplicantFromDB(applicantId: string) {
@@ -452,94 +470,99 @@ export class PayuService {
   }
 
   // ---------------- GENERATORS ----------------
-  generateVirtualCardId(applicantId: string, dob: string) {
-    applicantId = applicantId.toString();
-    const first2 = applicantId.slice(0, 2);
-    const first4 = applicantId.slice(0, 4);
-    const last4 = applicantId.slice(-4);
 
-    const d = new Date(dob);
-    const YY = d.getFullYear().toString().slice(-2);
-    const DD = d.getDate().toString().padStart(2, "0");
 
-    return `AQ${first2}-${first4}-${last4}-${YY}${DD}`;
-  }
+  // generateVirtualCardId(applicantId: string, dob: string) {
+  //   applicantId = applicantId.toString();
+  //   const first2 = applicantId.slice(0, 2);
+  //   const first4 = applicantId.slice(0, 4);
+  //   const last4 = applicantId.slice(-4);
 
-  generateMembershipId(applicantId: string) {
-    return "AQ" + applicantId.toString().slice(0, 2);
-  }
+  //   const d = new Date(dob);
+  //   const YY = d.getFullYear().toString().slice(-2);
+  //   const DD = d.getDate().toString().padStart(2, "0");
 
-  generateBottomValue(applicantId: string) {
-    return "ACHB" + applicantId.toString().padStart(6, "0");
-  }
+  //   return `AQ${first2}-${first4}-${last4}-${YY}${DD}`;
+  // }
+
+  // generateMembershipId(applicantId: string) {
+  //   return "AQ" + applicantId.toString().slice(0, 2);
+  // }
+
+  // generateBottomValue(applicantId: string) {
+  //   return "ACHB" + applicantId.toString().padStart(6, "0");
+  // }
 
   // --------- EXPIRY MONTH/YEAR (1 MONTH PLAN) ----------
-  getExpiryMonthYear() {
-    const today = new Date();
-    const expiry = new Date(today);
-    expiry.setMonth(expiry.getMonth() + 1);
+  // getExpiryMonthYear() {
+  //   const today = new Date();
+  //   const expiry = new Date(today);
+  //   expiry.setMonth(expiry.getMonth() + 1);
 
-    const month = (expiry.getMonth() + 1).toString().padStart(2, "0");
-    const year = expiry.getFullYear().toString();
+  //   const month = (expiry.getMonth() + 1).toString().padStart(2, "0");
+  //   const year = expiry.getFullYear().toString();
 
-    return { month, year };
-  }
+  //   return { month, year };
+  // }
 
   // ---------------- PDF GENERATION ----------------
-  async generateCardPdf(applicant: any) {
-    const pdfDoc = await PDFDocument.create();
+  // async generateCardPdf(applicant: any) {
+  //   const pdfDoc = await PDFDocument.create();
 
-    const page1 = pdfDoc.addPage([243, 153]);
-    const page2 = pdfDoc.addPage([243, 153]);
+  //   const page1 = pdfDoc.addPage([243, 153]);
+  //   const page2 = pdfDoc.addPage([243, 153]);
    
 
-    const frontImageBytes = fs.readFileSync('./dist/Payment/FrontQuess.png');
-    const backImageBytes = fs.readFileSync('./dist/Payment/BackQuess.png');
+  //   const frontImageBytes = fs.readFileSync('./dist/Payment/FrontQuess.png');
+  //   const backImageBytes = fs.readFileSync('./dist/Payment/BackQuess.png');
 
 
-    const frontImg = await pdfDoc.embedPng(frontImageBytes);
-    const backImg = await pdfDoc.embedPng(backImageBytes);
 
-    page1.drawImage(frontImg, { x: 0, y: 0, width: 243, height: 153 });
+  //   const frontImg = await pdfDoc.embedPng(frontImageBytes);
+  //   const backImg = await pdfDoc.embedPng(backImageBytes);
 
-    const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  //   page1.drawImage(frontImg, { x: 0, y: 0, width: 243, height: 153 });
 
-    page1.drawText(applicant.firstname, { x: 20, y: 15, size: 14, font, color: rgb(1, 1, 1) });
-    page1.drawText(applicant.virtual_card_number, { x: 20, y: 70, size: 14, font, color: rgb(1, 1, 1) });
-    page1.drawText(applicant.month, { x: 110, y: 50, size: 7, font, color: rgb(1, 1, 1) });
-    page1.drawText(applicant.year, { x: 130, y: 50, size: 7, font, color: rgb(1, 1, 1) });
+  //   const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    page2.drawImage(backImg, { x: 0, y: 0, width: 243, height: 153 });
+  //   page1.drawText(applicant.firstname, { x: 20, y: 15, size: 14, font, color: rgb(1, 1, 1) });
+  //   page1.drawText(applicant.virtual_card_number, { x: 20, y: 70, size: 14, font, color: rgb(1, 1, 1) });
+  //   page1.drawText(applicant.month, { x: 110, y: 50, size: 7, font, color: rgb(1, 1, 1) });
+  //   page1.drawText(applicant.year, { x: 130, y: 50, size: 7, font, color: rgb(1, 1, 1) });
 
-    page2.drawText(applicant.firstname, { x: 35, y: 45, size: 6, font, color: rgb(1, 1, 1) });
-    page2.drawText(applicant.dob, { x: 134, y: 45, size: 6, font, color: rgb(1, 1, 1) });
-    page2.drawText(applicant.membership_id, { x: 178, y: 45, size: 6, font, color: rgb(1, 1, 1) });
-    page2.drawText(applicant.bottomvalue, { x: 178, y: 15, size: 6, font, color: rgb(1, 1, 1) });
+  //   page2.drawImage(backImg, { x: 0, y: 0, width: 243, height: 153 });
 
-    const pdfBytes = await pdfDoc.save();
-    const fileName = `Card-${applicant.applicant_id}.pdf`;
-    fs.writeFileSync(fileName, pdfBytes);
+  //   page2.drawText(applicant.firstname, { x: 35, y: 45, size: 6, font, color: rgb(1, 1, 1) });
+  //   page2.drawText(applicant.dob, { x: 134, y: 45, size: 6, font, color: rgb(1, 1, 1) });
+  //   page2.drawText(applicant.membership_id, { x: 178, y: 45, size: 6, font, color: rgb(1, 1, 1) });
+  //   page2.drawText(applicant.bottomvalue, { x: 178, y: 15, size: 6, font, color: rgb(1, 1, 1) });
+
+  //   const pdfBytes = await pdfDoc.save();
+  //   const fileName = `Card-${applicant.applicant_id}.pdf`;
+  //   fs.writeFileSync(fileName, pdfBytes);
 
 
-    return fileName;
-  }
+  //   return fileName;
+  // }
 
-  async sendCardEmail(email: string, fileName: string) {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GODADDY_CONTACT_EMAIL_USER,
-        pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
-      },
-    });
+  // async sendCardEmail(email: string, fileName: string) {
+  //   const transporter = nodemailer.createTransport({
+  //    host: "smtpout.secureserver.net",
+  // port: 465,
+  // secure: true, // use SSL
+  // auth: {
+  //   user: process.env.GODADDY_CONTACT_EMAIL_USER,
+  //   pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
+  // },
+  //   });
 
-    await transporter.sendMail({
-      from: process.env.GODADDY_CONTACT_EMAIL_USER,
-      to: email,
-      subject: "Your AayurCare Membership Card",
-      text: "Attached is your membership card PDF.",
-      attachments: [{ filename: fileName, path: `./${fileName}` }],
-    });
-  }
+  //   await transporter.sendMail({
+  //     from: process.env.GODADDY_CONTACT_EMAIL_USER,
+  //     to: email,
+  //     subject: "Your AayurCare Membership Card",
+  //     text: "Attached is your membership card PDF.",
+  //     attachments: [{ filename: fileName, path: `./${fileName}` }],
+  //   });
+  // }
 }
 
