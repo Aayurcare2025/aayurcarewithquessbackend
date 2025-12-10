@@ -83,7 +83,7 @@
 //     // const fileName = await this.generateCardPdf(applicant);
 //     // console.log("fileName",fileName);
 
-
+         
 //     // Optionally email the PDF to customer
 //   //   await this.sendCardEmail(applicant.email, fileName);
 //   // }
@@ -491,9 +491,10 @@ export class PayuService {
 
     const page1 = pdfDoc.addPage([243, 153]);
     const page2 = pdfDoc.addPage([243, 153]);
+   
 
-    const frontImageBytes = fs.readFileSync('./FrontQuess.png');
-    const backImageBytes = fs.readFileSync('./BackQuess.png');
+    const frontImageBytes = fs.readFileSync('./src/Payment/FrontQuess.png');
+    const backImageBytes = fs.readFileSync('./src/Payment/BackQuess.png');
 
     const frontImg = await pdfDoc.embedPng(frontImageBytes);
     const backImg = await pdfDoc.embedPng(backImageBytes);
@@ -517,6 +518,7 @@ export class PayuService {
     const pdfBytes = await pdfDoc.save();
     const fileName = `Card-${applicant.applicant_id}.pdf`;
     fs.writeFileSync(fileName, pdfBytes);
+
 
     return fileName;
   }
