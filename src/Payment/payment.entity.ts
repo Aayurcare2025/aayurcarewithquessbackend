@@ -37,13 +37,13 @@ export class Payment {
   id: number;
 
   @Column()
-  firstname: string;
+  first_name: string;
 
   @Column()
-  email: string;
+  email_id: string;
 
   @Column()
-  phone: string;
+  contact_no: string;
 
   @Column()
   amount: string;

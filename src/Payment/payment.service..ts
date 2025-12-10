@@ -302,14 +302,17 @@ import { Between, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';
-import * as nodemailer from 'nodemailer';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { Applicant } from 'src/Api/dash.entity';
+// import * as nodemailer from 'nodemailer';
+// import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 @Injectable()
 export class PayuService {
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
+
+  
   ) {}
 
   private key = process.env.PAYU_KEY;
@@ -343,16 +346,33 @@ export class PayuService {
 
   // ---------------- SAVE PAYMENT ----------------
   async savePayment(data: any) {
-    const payment = this.paymentRepo.create({
-      firstname: data.firstname,
-      email: data.email,
-      phone: data.phone,
-      amount: data.amount,
-      txnid: data.txnid,
-      productinfo: data.productinfo,
-      status: "Success",
-      payment_date: new Date(),
-    });
+    // const payment = this.paymentRepo.create({
+    //   first_name: data.first_name,
+    //   email_id: data.email_id,
+    //   contact_no: data.contact_no,
+    //   amount: data.amount,
+    //   txnid: data.txnid,
+    //   productinfo: data.productinfo,
+    //   status: "Success",
+    //   payment_date: new Date(),
+    // });
+
+
+    const applicant=await this.getApplicantFromDB(data.applicant_id);
+
+    if (!applicant) {
+    console.log("applicant id not found");
+  }
+const payment = this.paymentRepo.create({
+  first_name: applicant?.first_name,
+  email_id: applicant?.email_id,
+  contact_no: applicant?.contact_no,
+  amount: data.amount,
+  txnid: data.txnid,
+  productinfo: data.productinfo,
+  status: "Success",
+  payment_date: new Date(),
+});
 
     const saved = await this.paymentRepo.save(payment);
 
@@ -463,15 +483,22 @@ export class PayuService {
   // }
 
   // ----------------- FETCH APPLICANT -----------------
+
+
   async getApplicantFromDB(applicantId: string) {
+
+
     return await this.paymentRepo.manager
-      .getRepository("Applicant")
+      // .getRepository("applicant")
+      .getRepository(Applicant)
       .findOne({ where: { applicant_id: applicantId } });
   }
 
   // ---------------- GENERATORS ----------------
 
 
+
+  //
   // generateVirtualCardId(applicantId: string, dob: string) {
   //   applicantId = applicantId.toString();
   //   const first2 = applicantId.slice(0, 2);
@@ -503,6 +530,7 @@ export class PayuService {
   //   const year = expiry.getFullYear().toString();
 
   //   return { month, year };
+  
   // }
 
   // ---------------- PDF GENERATION ----------------
