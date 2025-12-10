@@ -493,8 +493,8 @@ export class PayuService {
     const page2 = pdfDoc.addPage([243, 153]);
    
 
-    const frontImageBytes = fs.readFileSync('./src/Payment/FrontQuess.png');
-    const backImageBytes = fs.readFileSync('./src/Payment/BackQuess.png');
+    const frontImageBytes = fs.readFileSync('./dist/Payment/FrontQuess.png');
+    const backImageBytes = fs.readFileSync('./dist/Payment/BackQuess.png');
 
 
     const frontImg = await pdfDoc.embedPng(frontImageBytes);
