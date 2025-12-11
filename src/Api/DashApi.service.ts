@@ -92,10 +92,7 @@ export class DashService {
     try {
 
       //ap
-      //  Step 1: Prepare API body:--
-
-
-
+      //  Step 1: Prepare API body
       const data = {
         partner_name: this.partnerName,
         applicant_id,
@@ -146,8 +143,8 @@ export class DashService {
         designation: res.designation,
         work_location: res.work_location,
         company_name: res.employee_loan_status?.CompanyName,
-        // created_at:new Date()
-      created_at: new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata" })
+        created_at:new Date()
+      // created_at: new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata" })
       
 
 
@@ -181,130 +178,25 @@ export class DashService {
   }
 
 
-@Cron('0 59 23 * * *', {
-  timeZone: 'Asia/Kolkata',
-})
-  async sendApplicantExcel() {
-    try {
-      console.log(" Cron: Generating Applicant Excel Report (12 PM)");
- 
-      const startOfToday = new Date();
-startOfToday.setHours(0, 0, 0, 0);
-
-const endOfToday = new Date();
-
-endOfToday.setHours(23, 59, 59, 999);
-
-
-const applicants = await this.applicantRepo.find({
-  where: {
-    created_at: Between(startOfToday, endOfToday)
-  },
- select: [
-  "applicant_id",
-  "first_name",
-  "last_name",
-  "contact_no",
-  "email_id",
-  "DOB",
-  "gender",
-  "Pincode",
-  "City",
-  "State",
-  "customer_name",
-  "DOJ",
-  "employee_status",
-  "designation",
-  "work_location",
-  "company_name",
-  "created_at"
-]
-
-});
-
-console.log("excel applicant",applicants);
-      if (!applicants.length) {
-        console.log("⚠ No applicant data found.");
-        return;
-      }
-
-      // 2️⃣ Create Excel 
-
-      const workbook = new ExcelJS.Workbook();
-      const sheet = workbook.addWorksheet("Applicants");
-
-      sheet.columns = [
-        {header:"Applicant Id",key:"applicant_id",width:20},
-        { header: "First Name", key: "first_name", width: 30 },
-        {header:"Last Name",key:"last_name",width:30},
-        { header: "Contact Number", key: "contact_no", width: 30 },
-        {header:"Email id",key:"email_id",width:30},
-        {header:"DOB",key:"DOB",width:30},
-        {header:"gender",key:"gender",width:30},
-        {header:"Pincode",key:"Pincode",width:30},
-        {header:"City" ,key:"City",width:30},
-        {header:"State",key:"State",width:30},
-        {header:"Customer Name",key:"customer_name",width:30},
-        {header:"DOJ",key:"DOJ",width:30},
-        {header:"Employee Status",key:"employee_status",width:30},
-        {header:"Designation",key:"designation",width:30},
-        {header:"Work Location",key:"work_location",width:30},
-        {header:"Company Name",key:"company_name",width:30},
-        {header:"Login Time",key:"created_at",width:20},
-      ];
-     
-      applicants.forEach(row => sheet.addRow(row));
-      
-
-     const excelBuffer=Buffer.from(await workbook.xlsx.writeBuffer()) ;
-      // 3️⃣ Email sending:-
-      const transporter = nodemailer.createTransport({
-        host: this.configService.get("GODADDY_EMAIL_HOST"),
-        port: Number(this.configService.get("GODADDY_EMAIL_PORT")),
-        secure: true,
-        auth: {
-          user: this.configService.get("GODADDY_EMAIL_USER"),
-          pass: this.configService.get("GODADDY_EMAIL_PASS"),
-        },
-      });
-    
-      
-      await transporter.sendMail({
-        from: this.configService.get("GODADDY_EMAIL_USER"),
-        to:this.configService.get("GODADDY_PNO_EMAIL_USER_TO"),
-        subject: "Daily Login Report",
-        text: "Attached is the daily login daily report",
-        attachments: [
-          {
-            filename: "Applicant_Report_12PM.xlsx",
-           content:excelBuffer,
-          },
-        ],
-      });
-
-
-
-      
-      console.log("📨 Email sent successfully!");
-
-    } catch (error) {
-      console.error(" Error in cron:", error);
-    }
-
-  }
-
-
-
-// @Cron('0 0 1 * * *', {
+// @Cron('0 59 23 * * *', {
 //   timeZone: 'Asia/Kolkata',
 // })
 //   async sendApplicantExcel() {
 //     try {
 //       console.log(" Cron: Generating Applicant Excel Report (12 PM)");
  
-    
+//       const startOfToday = new Date();
+// startOfToday.setHours(0, 0, 0, 0);
+
+// const endOfToday = new Date();
+
+// endOfToday.setHours(23, 59, 59, 999);
+
 
 // const applicants = await this.applicantRepo.find({
+//   where: {
+//     created_at: Between(startOfToday, endOfToday)
+//   },
 //  select: [
 //   "applicant_id",
 //   "first_name",
@@ -397,6 +289,109 @@ console.log("excel applicant",applicants);
 //     }
 
 //   }
+
+
+
+@Cron('0 0 11 * * *', {
+  timeZone: 'Asia/Kolkata',
+})
+  async sendApplicantExcel() {
+    try {
+      console.log(" Cron: Generating Applicant Excel Report (12 PM)");
+
+const applicants = await this.applicantRepo.find({
+ select: [
+  "applicant_id",
+  "first_name",
+  "last_name",
+  "contact_no",
+  "email_id",
+  "DOB",
+  "gender",
+  "Pincode",
+  "City",
+  "State",
+  "customer_name",
+  "DOJ",
+  "employee_status",
+  "designation",
+  "work_location",
+  "company_name",
+  "created_at"
+]
+
+});
+
+console.log("excel applicant",applicants);
+      if (!applicants.length) {
+        console.log("⚠ No applicant data found.");
+        return;
+      }
+
+      // 2️⃣ Create Excel 
+
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Applicants");
+
+      sheet.columns = [
+        {header:"Applicant Id",key:"applicant_id",width:20},
+        { header: "First Name", key: "first_name", width: 30 },
+        {header:"Last Name",key:"last_name",width:30},
+        { header: "Contact Number", key: "contact_no", width: 30 },
+        {header:"Email id",key:"email_id",width:30},
+        {header:"DOB",key:"DOB",width:30},
+        {header:"gender",key:"gender",width:30},
+        {header:"Pincode",key:"Pincode",width:30},
+        {header:"City" ,key:"City",width:30},
+        {header:"State",key:"State",width:30},
+        {header:"Customer Name",key:"customer_name",width:30},
+        {header:"DOJ",key:"DOJ",width:30},
+        {header:"Employee Status",key:"employee_status",width:30},
+        {header:"Designation",key:"designation",width:30},
+        {header:"Work Location",key:"work_location",width:30},
+        {header:"Company Name",key:"company_name",width:30},
+        {header:"Login Time",key:"created_at",width:20},
+      ];
+     
+      applicants.forEach(row => sheet.addRow(row));
+      
+
+     const excelBuffer=Buffer.from(await workbook.xlsx.writeBuffer()) ;
+      // 3️⃣ Email sending:-
+      const transporter = nodemailer.createTransport({
+        host: this.configService.get("GODADDY_EMAIL_HOST"),
+        port: Number(this.configService.get("GODADDY_EMAIL_PORT")),
+        secure: true,
+        auth: {
+          user: this.configService.get("GODADDY_EMAIL_USER"),
+          pass: this.configService.get("GODADDY_EMAIL_PASS"),
+        },
+      });
+    
+      
+      await transporter.sendMail({
+        from: this.configService.get("GODADDY_EMAIL_USER"),
+        to:this.configService.get("GODADDY_PNO_EMAIL_USER_TO"),
+        subject: "Daily Login Report",
+        text: "Attached is the daily login daily report",
+        attachments: [
+          {
+            filename: "Applicant_Report_12PM.xlsx",
+           content:excelBuffer,
+          },
+        ],
+      });
+
+
+
+      
+      console.log("📨 Email sent successfully!");
+
+    } catch (error) {
+      console.error(" Error in cron:", error);
+    }
+
+  }
 
   
 
