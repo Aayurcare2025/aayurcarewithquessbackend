@@ -37,8 +37,7 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-
-
+//data
   // await app.listen(6000, '0.0.0.0');
   //port number chnge 
 
