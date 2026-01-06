@@ -10,8 +10,6 @@ export class Login
    phonenumber:string;
 
    
-   @Column({type:'timestamp'})
-   login_date:Date;
 
    //data 
    

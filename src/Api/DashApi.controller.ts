@@ -20,6 +20,8 @@
 
 
 
+
+
 import { Controller, Get, Query } from '@nestjs/common';
 import { DashService } from './DashApi.service';
 
@@ -43,7 +45,7 @@ export class DashController {
     }
     //process not set in env:
     const data = await this.dashService.getApplicantDataAndSave(applicant_id);
-
+  
     return {
       message: ' Data fetched and saved successfully',
       applicant_id,

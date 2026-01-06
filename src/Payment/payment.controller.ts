@@ -1,39 +1,46 @@
 import { Controller, Post, Body, Req, Res } from '@nestjs/common';
 
 import express from 'express';
-import { PayuService } from './payment.service.';
+import { PayuService } from './payment.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Response } from 'express';
 @Controller('payment')
 export class PayuController {
   constructor(private readonly payuService: PayuService) {}
 
   // POST /payment/initiate
 
+  //first person is coming from table:
 
   @Post('initiate')
   async initiatePayment(@Body() body, @Res() res: express.Response) {
     const txnid = 'TXN' + new Date().getTime(); // unique transaction ID
     const paymentData = {
-
-      
       txnid,
-      amount: body.amount,
-      productinfo: body.productinfo,
+      amount: body.amount || '',
+      // amount: '200.00',
+      productinfo: body.productinfo || 'Basic Plan',
       // firstname: body.firstname,
       // email: body.email,
       //  phone: body.phone || '9999999999', // add default test phone
+
       firstname: body.firstname || '',
       email: body.email || '',
-      phone: body.phonenumber || '',
-      applicant_id:body.applicant_id || '',
+      phone: body.phone || '', // add default test phone
+      // applicant_id:body.applicant_id || '',
+      udf1: body.applicant_id || '',
+      udf2: '',
+      udf3: '',
+      udf4: '',
+      udf5: '', 
       surl: 'https://api.partner-quess.aayurcare.com/payment/success',
       furl: 'https://api.partner-quess.aayurcare.com/payment/failure',
+      //   surl: 'http://localhost:7000/payment/success',
+      // furl: 'http://localhost:7000/payment/failure',
       date:new Date(),
 
 
 
-
-//data has to
     };
 
     const payuData = await this.payuService.initiatePayment(paymentData);
@@ -55,6 +62,7 @@ export class PayuController {
     }
   }
 
+
 // @Post('/success')
 // handleSuccess(@Body() body, @Res() res: Response) {
 //   console.log('✅ Payment success:', body);
@@ -62,37 +70,76 @@ export class PayuController {
 // (res as any).redirect('https://partner-quess.aayurcare.com/payment-success');
 // }
 
+// @Post('/failure')
+// handleFailure(@Body() body, @Res() res: Response) {
+//   console.log('❌ Payment failure:', body);
+//   // Redirect to your frontend's failure page
+//   // (res as any).redirect('https://partner-quess.aayurcare.com/payment-failure');
+//   (res as any).redirect('http://localhost:7000/payment-failure');
+// }
+
+
+
+
+
+// @Post('/success')
+// async handleSuccess(@Body() body, @Res() res: Response) {
+//   console.log('Payment success:', body);
+
+//   await this.payuService.savePayment({
+//     firstname: body.firstname,
+//     email: body.email,
+//     phone: body.phone,
+//     applicant_id:body.applicant_id,
+//     amount: body.amount,
+//     txnid: body.txnid,
+//     productinfo: body.productinfo,
+//   });
+
+//     // await this.payuService.sendStyledEmail(body.email,body.amount);
+    
+//     // return { status: "success", message: "Payment saved & Email sent" };
+
+//   // return (res as any).redirect('https://partner-quess.aayurcare.com/payment-success');
+//     return (res as any).redirect('http://localhost:3000/payment-success');
+// }
+
+
+
+
+
+
 @Post('/failure')
-handleFailure(@Body() body, @Res() res: Response) {
+handleFailure(@Body() body: any, @Res() res) {
   console.log('❌ Payment failure:', body);
-  // Redirect to your frontend's failure page
-  (res as any).redirect('https://partner-quess.aayurcare.com/payment-failure');
+  res.redirect('https://partner-quess.aayurcare.com/payment-failure');
 }
-
-
-
-
 
 @Post('/success')
-async handleSuccess(@Body() body, @Res() res: Response) {
-  console.log('Payment success:', body);
+handleSuccess(@Body() body: any, @Res() res) {
+  console.log('✅ Payment success received');
 
-  await this.payuService.savePayment({
-    firstname: body.firstname,
-    email: body.email,
-    phone: body.phone,
-    applicant_id:body.applicant_id,
-    amount: body.amount,
-    txnid: body.txnid,
-    productinfo: body.productinfo,
+  // Redirect immediately
+  res.redirect('https://partner-quess.aayurcare.com/payment-success');
+
+  // Background processing
+  setImmediate(async () => {
+    try {
+      await this.payuService.savePayment({
+        firstname: body.firstname,
+        email: body.email,
+        phone: body.phone,
+        applicant_id:body.udf1,
+        // applicant_id: body.applicant_id,
+        amount: body.amount,
+        txnid: body.txnid,
+        productinfo: body.productinfo,
+      });
+    } catch (err) {
+      console.error('❌ Post-payment error:', err);
+    }
   });
-
-  return (res as any).redirect('https://partner-quess.aayurcare.com/payment-success');
 }
-
-
-
-
 
 }
 

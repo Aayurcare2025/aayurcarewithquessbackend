@@ -24,17 +24,6 @@
 
 //     @Column({nullable:true})
 //     productinfo:string;
-
-    
-
-
-
-
-
-
-
-
-
     
 // }
 
@@ -48,13 +37,13 @@ export class Payment {
   id: number;
 
   @Column()
-  firstname: string;
+  first_name: string;
 
   @Column()
   email: string;
 
   @Column()
-  phone: string;
+  contact_no: string;
 
   @Column()
   amount: string;
