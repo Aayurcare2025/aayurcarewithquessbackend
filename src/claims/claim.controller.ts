@@ -522,6 +522,9 @@ All documents are attached to this email.
       files // Send ALL files at once
     );
 
+
+    await this.mailService.sendClaimSubmittedMail(body.emailid)
+
     // 📌 Prepare DB payload
     const payload = {
       name: body.name || "",

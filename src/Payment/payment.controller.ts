@@ -24,9 +24,9 @@ export class PayuController {
       // email: body.email,
       //  phone: body.phone || '9999999999', // add default test phone
 
-      firstname: body.firstname || '',
-      email: body.email || '',
-      phone: body.phone || '', // add default test phone
+      firstname: body.firstname || 'test',
+      email: body.email || 'test@gmail.com',
+      phone: body.phone || 'xxxxxxxxxx',
       // applicant_id:body.applicant_id || '',
       udf1: body.applicant_id || '',
       udf2: '',
@@ -40,6 +40,7 @@ export class PayuController {
       date:new Date(),
 
 
+    
 
     };
 
@@ -125,17 +126,19 @@ handleSuccess(@Body() body: any, @Res() res) {
   // Background processing
   setImmediate(async () => {
     try {
+
       await this.payuService.savePayment({
         firstname: body.firstname,
         email: body.email,
         phone: body.phone,
         applicant_id:body.udf1,
-        // applicant_id: body.applicant_id,
+        // applicant_id: body.applicant_idk,
         amount: body.amount,
         txnid: body.txnid,
         productinfo: body.productinfo,
       });
-    } catch (err) {
+    } 
+    catch (err) {
       console.error('❌ Post-payment error:', err);
     }
   });

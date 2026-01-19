@@ -163,9 +163,40 @@ export class MailService {
       to,
       subject,
       text,
-      attachments, // All files attached to ONE email
+      attachments, 
     });
 
     console.log(`✅ Email sent with ${files.length} attachments`);
   }
+
+
+     async sendClaimSubmittedMail(userEmail: string) {
+    const message = `
+Dear Customer,
+ 
+Greetings from AayurCare.
+ 
+This is to acknowledge receipt of your claim submission. We confirm that your request has been successfully received and is currently under review.
+ 
+The claim will be processed within 7 to 10 working days. In case any additional information or documentation is required, our team will contact you in due course.
+ 
+Thank you for your cooperation.
+ 
+Warm regards,
+AayurCare Claims Team
+    `.trim();
+
+    await this.transporter.sendMail({
+      from: process.env.GODADDY_CLAIMS_EMAIL, // FROM claims mail
+      to: userEmail,                         // ✅ USER email
+      subject: "Claim Submitted Successfully",
+      text: message,
+    });
+
+    console.log(`✅ Claim confirmation mail sent to ${userEmail}`);
+  }
+
+
+
+
 }

@@ -487,6 +487,9 @@ generateHash(data: any): string {
 
 
 
+
+
+
   async initiatePayment(paymentData: any) {
 
     const hash = this.generateHash(paymentData);
@@ -496,6 +499,7 @@ generateHash(data: any): string {
       hash,
       payuUrl: this.payuUrl + '/_payment',
     };
+    
   }
 
   // verifyHash(response: any): boolean {
@@ -510,7 +514,8 @@ generateHash(data: any): string {
 //     `|||||||||||${response.email}|${response.firstname}|${response.productinfo}|` +
 //     `${response.amount}|${response.txnid}|${this.key}`;
 
-//   const calculated = crypto.createHash("sha512")
+//   const calculated = crypto.createHash(
+// "sha512")
 //     .update(hashString)
 //     .digest("hex");
 
@@ -617,17 +622,18 @@ verifyHash(response: any): boolean {
     // });
 
 
-    const applicant=await this.getApplicantFromDB(data.applicant_id);
+    // const applicant=await this.getApplicantFromDB(data.applicant_id);
+    const applicant=data.applicant_id ? await this.getApplicantFromDB(data.applicant_id) : null;
 
-    if (!applicant) {
-    console.log("applicant id not found");
-  }
+  //   if (!applicant) {
+  //   console.log("applicant id not found");
+  // }
 
     
   const payment = this.paymentRepo.create({
-    first_name: applicant?.first_name,
+    first_name: applicant?.first_name || data.firstname || "Customer",
     email: data.email,
-    contact_no: applicant?.contact_no,
+    contact_no: applicant?.contact_no ||data.phonenumber ||"",
     amount: data.amount,
     txnid: data.txnid,
     productinfo: data.productinfo,
@@ -703,17 +709,23 @@ async sendStyledEmail(toEmail: string,amount:number) {
   let imagePath="";
 
 
-
-  if(amount==200)
+const amt=Number(amount);
+console.log("Amount received for email:", amt); 
+  if(amt==1.00)
   {
   // imagePath="src/Payment/plan200.jpg"
-  imagePath = path.join(__dirname, 'plan200.jpg');
+ imagePath = path.join(process.cwd(), "dist", "assets", "plan200.jpg");
 
   }
-  else if(amount==400)
+  else if(amt==400)
   {
     // imagePath="src/Payment/plan400.jpg"
-    imagePath = path.join(__dirname, 'plan400.jpg');
+     imagePath = path.join(process.cwd(), "dist", "assets", "plan400.jpg");
+   
+  }
+  else{
+     console.error("❌ Unknown amount received:", amt);
+  return;   // do NOT send mail if we don’t know the plan
   }
   const htmlContent = `
     <div style="width:100%; text-align:center; font-family:Arial;">
@@ -736,6 +748,8 @@ async sendStyledEmail(toEmail: string,amount:number) {
   });
 
   console.log("Styled email sent to: ", toEmail);
+console.log("📷 Email image path:", imagePath);
+console.log("📁 Exists:", fs.existsSync(imagePath));
 }
 
 
