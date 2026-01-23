@@ -24,6 +24,7 @@ import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
+  
   const app = await NestFactory.create(AppModule, { cors: true });
 
   app.enableCors({
@@ -33,8 +34,6 @@ async function bootstrap() {
   });
 
 
-  
-
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -43,7 +42,7 @@ async function bootstrap() {
   // await app.listen(6000, '0.0.0.0');
   //port number chnge 
 
-   const port =6000;
+   const port =7000;
   await app.listen(port,  '0.0.0.0');
   console.log(`Application is running on: http://localhost:${port}`);
 

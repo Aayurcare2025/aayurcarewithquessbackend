@@ -71,34 +71,24 @@ export class DashService {
 //error handling if entering employee details is wrong:
 //like contact no or first name or applicant isw wrong:
 
-  private readonly partnerName = 'aayurcare';
-  private readonly partnerKey = 'a0368ae2-f9af-48cd-b55d-136402ccddd0';
-  private readonly apiUrl = 'https://api.hamarabenefits.com/api/v1/submitLoanDetail';
+  // private readonly partnerName = 'aayurcare';
+  // private readonly partnerKey = 'a0368ae2-f9af-48cd-b55d-136402ccddd0';
+  // private readonly apiUrl = 'https://api.hamarabenefits.com/api/v1/submitLoanDetail';
 
-
-
-
-
-  /**
-   * Fetch data from Dash API and save it in DB
-   */
-
-  //error handling if entering employee details is wrong:
-
-
-
-  
   async getApplicantDataAndSave(applicant_id: string) {
     try {
 
-      //ap
-      //  Step 1: Prepare API body
       const data = {
-        partner_name: this.partnerName,
+
+        
+        partner_name: this.configService.get<string>('partnerName'),
         applicant_id,
         date: new Date().toISOString().slice(0, 10),
-        partner_key: this.partnerKey,
+        partner_key: this.configService.get<string>('partnerKey'),
       };
+
+
+      console.log("data",data);
      
       
 
@@ -107,11 +97,14 @@ export class DashService {
       const body = { token, ...data };
       
       //  Step 2: Call external Dash API
-      const response = await axios.post(this.apiUrl, body);
+const apiUrl = this.configService.get<string>('apiUrl')!;
+const response = await axios.post(apiUrl, body);
+      // const response = await axios.post(this.configService.get<string>('apiUrl'), body);
       const res = response.data.response;
       console.log("res",res);
 
       if (!res) throw new Error('Invalid response from Dash API');
+
 
    
       //  Step 3: Check if this record already exists
@@ -119,10 +112,7 @@ export class DashService {
         where: { applicant_id: res.applicant_id },
       });
 
-
-      
-
-
+    
       //data
       const applicant = {
         
@@ -130,10 +120,10 @@ export class DashService {
         first_name: res.first_name, 
         last_name: res.last_name,
         contact_no: res.contact_no,
-        // contact_no: res.contact_no || contact_no,
+      
         email_id: res.email_id || '',
         DOB: res.DOB,
-        gender: res.gender, 
+        gender: res.gender,
         Pincode: res.Pincode,
         City: res.City,
         State: res.State,
@@ -174,7 +164,7 @@ export class DashService {
       return response.data;
     } catch (error) {
       console.error(' Error fetching or saving applicant:', error.response?.data || error.message);
-      throw new Error('Failed to fetch or save applicant data');
+      throw new Error('Failed to fetch or s ave applicant data');
     }
   }
 

@@ -22,18 +22,22 @@
 
 
 
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { DashService } from './DashApi.service';
+import { ConfigService } from '@nestjs/config';
+import { ApiKeyGuard } from './api-key-guard';
 
 @Controller('dash')
 export class DashController {
   
-  constructor(private readonly dashService: DashService) {}
+  constructor(private readonly dashService: DashService,
+    // private readonly configService:ConfigService
+  ) {}
 
   //
   //  Main API - GET /dash/applicant
   // Example: /dash/applicant?applicant_id=2003126588&contact_no=8628908673
-  
+  @UseGuards(ApiKeyGuard)
   @Get('applicant')
   async getApplicant(
     @Query('applicant_id') applicant_id: string,
@@ -46,6 +50,7 @@ export class DashController {
     //process not set in env:
     const data = await this.dashService.getApplicantDataAndSave(applicant_id);
   
+    console
     return {
       message: ' Data fetched and saved successfully',
       applicant_id,
