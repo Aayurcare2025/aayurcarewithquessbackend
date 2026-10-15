@@ -10,11 +10,15 @@ export class ApiKeyGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const apiKey = request.headers['x-api-key'];
 
-    const validKeys = [
-      this.configService.get<string>('AAYURCARE_API_KEY'),
-    ];
+    const configuredKey = this.configService.get<string>('AAYURCARE_API_KEY');
 
-    if (!validKeys.includes(apiKey)) {
+    // Fail closed: if no key is configured, reject every request rather than
+    // letting an empty/missing header match an empty config value.
+    if (!configuredKey) {
+      throw new UnauthorizedException('API key not configured');
+    }
+
+    if (apiKey !== configuredKey) {
       throw new UnauthorizedException('Invalid API Key');
     }
 

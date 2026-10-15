@@ -27,8 +27,18 @@ async function bootstrap() {
   
   const app = await NestFactory.create(AppModule, { cors: true });
 
+  // Allowed origins can be overridden via CORS_ORIGINS (comma-separated).
+  // Defaults cover the production frontend and local development.
+  const defaultOrigins = [
+    'https://partner-quess.aayurcare.com',
+    'http://localhost:3000',
+  ];
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
+    : defaultOrigins;
+
   app.enableCors({
-    origin: ['https://partner-quess.aayurcare.com','http://localhost:3000'], // frontend URL
+    origin: corsOrigins, // frontend URL(s)
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -37,13 +47,8 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-
-
-  // await app.listen(6000, '0.0.0.0');
-  //port number chnge 
-
-   const port =7000;
-  await app.listen(port,  '0.0.0.0');
+  const port = Number(process.env.PORT) || 7000;
+  await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://localhost:${port}`);
 
 

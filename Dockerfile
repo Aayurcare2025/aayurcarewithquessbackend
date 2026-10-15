@@ -26,7 +26,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy compiled dist folder from builder stage
 COPY --from=builder /build/dist ./dist
@@ -34,8 +34,8 @@ COPY --from=builder /build/dist ./dist
 # ✅ Remove this line (causing error)
 # COPY --from=builder /build/.env ./
 
-# Expose port (change if needed)
-EXPOSE 6000
+# Expose port (must match the app's listen port; override at runtime with PORT env)
+EXPOSE 7000
 
 # Start the app
 CMD ["node", "dist/main.js"]
