@@ -404,23 +404,28 @@ import { Claims } from "./claim.entity";
 import { ClaimsService } from "./claim.service";
 import { MailService } from "./Mail.service";
 
-// Validate ENV
-if (
-  !process.env.AWS_REGION ||
-  !process.env.AWS_ACCESS_KEY_ID ||
-  !process.env.AWS_SECRET_ACCESS_KEY
-) {
-  throw new Error("AWS credentials or region not set in environment variables");
-}
+// S3 is OPTIONAL. If the AWS env vars are missing the app still boots and all
+// non-upload endpoints keep working; only claim file uploads are disabled until
+// AWS_REGION / AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (and AWS_BUCKET_NAME)
+// are set.
+const s3 =
+  process.env.AWS_REGION &&
+  process.env.AWS_ACCESS_KEY_ID &&
+  process.env.AWS_SECRET_ACCESS_KEY
+    ? new S3Client({
+        region: process.env.AWS_REGION,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
+      })
+    : null;
 
-// Create S3 Client
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+if (!s3) {
+  console.warn(
+    "[claims] AWS S3 not configured (AWS_REGION/AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY missing). Claim file uploads are disabled until these are set."
+  );
+}
 
 @Controller("claims")
 export class ClaimsController {
@@ -437,8 +442,15 @@ export class ClaimsController {
   ): Promise<Claims> {
     console.log("📥 Received files:", files.map(f => f.fieldname));
 
-    const bucketName = process.env.AWS_BUCKET_NAME!;
-    const region = process.env.AWS_REGION!;
+    const bucketName = process.env.AWS_BUCKET_NAME;
+    const region = process.env.AWS_REGION;
+    const uploadsEnabled = Boolean(s3 && bucketName && region);
+
+    if (files.length && !uploadsEnabled) {
+      console.warn(
+        "[claims] Files were submitted but S3 is not configured; skipping uploads. The claim is still recorded and emailed with attachments."
+      );
+    }
 
     const personName =
       body.name?.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9\-]/g, "") ||
@@ -453,12 +465,12 @@ export class ClaimsController {
       f.fieldname.startsWith("serviceFile_")
     );
 
-    // 🔥 Upload bank document
-    if (bankDocument) {
+    // 🔥 Upload bank document (only when S3 is configured)
+    if (bankDocument && uploadsEnabled) {
       const ext = bankDocument.originalname.split(".").pop();
       const fileName = `${personName}-bank.${ext}`;
 
-      await s3.send(
+      await s3!.send(
         new PutObjectCommand({
           Bucket: bucketName,
           Key: fileName,
@@ -471,25 +483,31 @@ export class ClaimsController {
       bankDocumentUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
     }
 
-    // 🔥 Upload service files dynamically
+    // 🔥 Upload service files dynamically (only when S3 is configured)
     for (let i = 0; i < serviceDocs.length; i++) {
       const file = serviceDocs[i];
-      const ext = file.originalname.split(".").pop();
-      const fileName = `${personName}-service-${i + 1}.${ext}`;
+      let fileUrl: string | null = null;
 
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: bucketName,
-          Key: fileName,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-          ServerSideEncryption: "AES256",
-        })
-      );
+      if (uploadsEnabled) {
+        const ext = file.originalname.split(".").pop();
+        const fileName = `${personName}-service-${i + 1}.${ext}`;
+
+        await s3!.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: fileName,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+            ServerSideEncryption: "AES256",
+          })
+        );
+
+        fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+      }
 
       serviceFileUrls.push({
         serviceType: body[`serviceType_${i}`],
-        fileUrl: `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`,
+        fileUrl,
       });
     }
 
