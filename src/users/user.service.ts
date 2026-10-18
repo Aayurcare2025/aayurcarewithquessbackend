@@ -399,7 +399,11 @@ import { DashService } from 'src/Api/DashApi.service';
       try {
         const response = await axios.post(this.URL!, payload, {
           headers: {
-            Authorization: this.BSNL_TOKEN,
+            // BRPS expects a Bearer-prefixed token. BSNL_TOKEN holds the raw
+            // token; add the prefix here (unless it's already present).
+            Authorization: this.BSNL_TOKEN?.startsWith('Bearer ')
+              ? this.BSNL_TOKEN
+              : `Bearer ${this.BSNL_TOKEN}`,
             'Content-Type': 'application/json',
           },
           timeout: 15000,
