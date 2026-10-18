@@ -33,8 +33,8 @@ export class PayuController {
       udf3: '',
       udf4: '',
       udf5: '', 
-      surl: 'https://api.partner-quess.aayurcare.com/payment/success',
-      furl: 'https://api.partner-quess.aayurcare.com/payment/failure',
+      surl: `${process.env.BACKEND_URL || 'https://4lxmjt45zon6pu5yrlcuouu6.200.234.44.53.sslip.io'}/payment/success`,
+      furl: `${process.env.BACKEND_URL || 'https://4lxmjt45zon6pu5yrlcuouu6.200.234.44.53.sslip.io'}/payment/failure`,
       //   surl: 'http://localhost:7000/payment/success',
       // furl: 'http://localhost:7000/payment/failure',
       date:new Date(),
@@ -113,7 +113,7 @@ export class PayuController {
 @Post('/failure')
 handleFailure(@Body() body: any, @Res() res) {
   console.log('❌ Payment failure:', body);
-  res.redirect('https://partner-quess.aayurcare.com/payment-failure');
+  res.redirect(`${process.env.FRONTEND_URL || 'https://partner-quess.aayurcare.com'}/payment-failure`);
 }
 
 @Post('/success')
@@ -121,7 +121,7 @@ handleSuccess(@Body() body: any, @Res() res) {
   console.log('✅ Payment success received');
 
   // Redirect immediately
-  res.redirect('https://partner-quess.aayurcare.com/payment-success');
+  res.redirect(`${process.env.FRONTEND_URL || 'https://partner-quess.aayurcare.com'}/payment-success`);
 
   // Background processing
   setImmediate(async () => {
