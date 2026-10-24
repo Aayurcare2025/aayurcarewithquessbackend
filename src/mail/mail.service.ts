@@ -53,12 +53,12 @@ export class MailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: Number(process.env.EMAIL_PORT) || 587,
-      secure: false, // ✅ false for port 587
+      host: "smtpout.secureserver.net",
+      port: 465,
+      secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.GODADDY_NO_REPLY_MAIL,
+        pass: process.env.GODADDY_NO_REPLY_PASSWORD,
       },
       tls: {
         rejectUnauthorized: false,
@@ -86,8 +86,8 @@ export class MailService {
 
     try {
       const info = await this.transporter.sendMail({
-        from: `"AayurCare Website" <${process.env.EMAIL_USER}>`,
-        to: process.env.EMAIL_TO,
+        from: `"AayurCare Website" <${process.env.GODADDY_NO_REPLY_MAIL}>`,
+        to: process.env.EMAIL_TO || process.env.GODADDY_NO_REPLY_MAIL,
         subject: `New Contact Message from ${name}`,
         html: htmlContent,
       });

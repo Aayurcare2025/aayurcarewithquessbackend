@@ -29,7 +29,7 @@
 
 // //   async sendFileMail(to: string, subject: string, text: string, file: Express.Multer.File) {
 // //     await this.transporter.sendMail({
-// //       from: process.env.GODADDY_EMAIL_USER,
+// //       from: process.env.GODADDY_NO_REPLY_MAIL,
 // //       to,
 // //       subject,
 // //       text,
@@ -119,8 +119,8 @@ export class MailService {
     port: 465,
     secure: true,
     auth: {
-      user: process.env.GODADDY_EMAIL_USER,
-      pass: process.env.GODADDY_EMAIL_PASS,
+      user: process.env.GODADDY_NO_REPLY_MAIL,
+      pass: process.env.GODADDY_NO_REPLY_PASSWORD,
     },
   });
 
@@ -132,7 +132,7 @@ export class MailService {
     file: Express.Multer.File
   ) {
     await this.transporter.sendMail({
-      from: process.env.GODADDY_EMAIL_USER,
+      from: process.env.GODADDY_NO_REPLY_MAIL,
       to,
       subject,
       text,
@@ -159,7 +159,7 @@ export class MailService {
     }));
 
     await this.transporter.sendMail({
-      from: process.env.GODADDY_EMAIL_USER,
+      from: process.env.GODADDY_NO_REPLY_MAIL,
       to,
       subject,
       text,
@@ -187,7 +187,7 @@ AayurCare Claims Team
     `.trim();
 
     await this.transporter.sendMail({
-      from: process.env.GODADDY_CLAIMS_EMAIL, // FROM claims mail
+      from: process.env.GODADDY_NO_REPLY_MAIL, // FROM no-reply (all comms)
       to: userEmail,                         // ✅ USER email
       subject: "Claim Submitted Successfully",
       text: message,

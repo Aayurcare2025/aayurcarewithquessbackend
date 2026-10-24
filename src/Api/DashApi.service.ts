@@ -350,19 +350,19 @@ console.log("excel applicant",applicants);
      const excelBuffer=Buffer.from(await workbook.xlsx.writeBuffer()) ;
       // 3️⃣ Email sending:-
       const transporter = nodemailer.createTransport({
-        host: this.configService.get("GODADDY_EMAIL_HOST"),
-        port: Number(this.configService.get("GODADDY_EMAIL_PORT")),
+        host: "smtpout.secureserver.net",
+        port: 465,
         secure: true,
         auth: {
-          user: this.configService.get("GODADDY_EMAIL_USER"),
-          pass: this.configService.get("GODADDY_EMAIL_PASS"),
+          user: this.configService.get("GODADDY_NO_REPLY_MAIL"),
+          pass: this.configService.get("GODADDY_NO_REPLY_PASSWORD"),
         },
       });
-    
-      
+
+
       await transporter.sendMail({
-        from: this.configService.get("GODADDY_EMAIL_USER"),
-        to:this.configService.get("GODADDY_PNO_EMAIL_USER_TO"),
+        from: this.configService.get("GODADDY_NO_REPLY_MAIL"),
+        to:this.configService.get("GODADDY_PNO_EMAIL_USER_TO") || this.configService.get("GODADDY_NO_REPLY_MAIL"),
         subject: "Daily Login Report",
         text: "Attached is the daily login daily report",
         attachments: [

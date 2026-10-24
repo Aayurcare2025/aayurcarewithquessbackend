@@ -597,18 +597,18 @@ import { DashService } from 'src/Api/DashApi.service';
 
     try {
       const transporter = nodemailer.createTransport({
-        host: process.env.GODADDY_EMAIL_HOST,
-        port: Number(process.env.GODADDY_EMAIL_PORT),
+        host: "smtpout.secureserver.net",
+        port: 465,
         secure: true,
         auth: {
-          user: process.env.GODADDY_CONTACT_EMAIL_USER,
-          pass: process.env.GODADDY_CONTACT_EMAIL_PASS,
+          user: process.env.GODADDY_NO_REPLY_MAIL,
+          pass: process.env.GODADDY_NO_REPLY_PASSWORD,
         },
       });
 
       await transporter.sendMail({
-        from: this.configService.get('GODADDY_CONTACT_EMAIL_USER'),
-        to: this.configService.get('GODADDY_CONTACT_EMAIL_USER'),
+        from: this.configService.get('GODADDY_NO_REPLY_MAIL'),
+        to: this.configService.get('GODADDY_NO_REPLY_MAIL'),
         subject: `📞 Callback Request from ${name}`,
         html: `
           <h3>New Callback Request</h3>
